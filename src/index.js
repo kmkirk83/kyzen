@@ -18,8 +18,21 @@ const app = express();
 // Security headers
 app.use(helmet());
 
-// CORS
-app.use(cors({ origin: config.cors.origin }));
+// CORS — only allow explicitly configured origins
+const allowedOrigins = new Set(config.cors.allowedOrigins);
+app.use(
+  cors({
+    origin: function (requestOrigin, callback) {
+      // Allow server-to-server requests (no Origin header) and configured origins.
+      if (!requestOrigin || allowedOrigins.has(requestOrigin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS: origin '${requestOrigin}' is not allowed.`));
+      }
+    },
+    optionsSuccessStatus: 200,
+  }),
+);
 
 // Request logging (skip in test mode to keep output clean)
 if (config.nodeEnv !== 'test') {
