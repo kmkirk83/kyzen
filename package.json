@@ -1,0 +1,46 @@
+{
+  "name": "clarion",
+  "version": "1.0.0",
+  "description": "AI-powered middleware for marketing and SEO research",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest --testEnvironment=node --forceExit",
+    "test:watch": "jest --testEnvironment=node --watch",
+    "test:coverage": "jest --testEnvironment=node --coverage --forceExit"
+  },
+  "keywords": [
+    "seo",
+    "marketing",
+    "ai",
+    "middleware",
+    "research"
+  ],
+  "author": "Clarion",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "openai": "^4.20.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.1",
+    "supertest": "^6.3.3"
+  },
+  "overrides": {
+    "brace-expansion": "^5.0.9"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
+  }
+}
