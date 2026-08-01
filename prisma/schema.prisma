@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  ANALYST
+  VIEWER
+}
+
+enum AuditStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+model User {
+  id            String        @id @default(cuid())
+  email         String        @unique
+  name          String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  memberships   Membership[]
+  auditLogs     AuditLog[]
+  apiKeys       ApiKey[]
+}
+
+model Organization {
+  id                String             @id @default(cuid())
+  name              String
+  slug              String             @unique
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  memberships       Membership[]
+  brands            Brand[]
+  visibilityAudits  VisibilityAudit[]
+  reports           Report[]
+  apiKeys           ApiKey[]
+  billingCustomer   BillingCustomer?
+  subscriptions     Subscription[]
+  auditLogs         AuditLog[]
+}
+
+model Membership {
+  id             String        @id @default(cuid())
+  userId         String
+  organizationId String
+  role           Role          @default(ANALYST)
+  createdAt      DateTime      @default(now())
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+}
+
+model Brand {
+  id              String            @id @default(cuid())
+  organizationId  String
+  name            String
+  website         String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  competitors     Competitor[]
+}
+
+model Competitor {
+  id              String            @id @default(cuid())
+  brandId         String
+  name            String
+  website         String?
+  createdAt       DateTime          @default(now())
+  brand           Brand             @relation(fields: [brandId], references: [id], onDelete: Cascade)
+}
+
+model VisibilityAudit {
+  id              String            @id @default(cuid())
+  organizationId  String
+  status          AuditStatus       @default(QUEUED)
+  score           Float?
+  assistant       String
+  createdAt       DateTime          @default(now())
+  completedAt     DateTime?
+  organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model Report {
+  id              String            @id @default(cuid())
+  organizationId  String
+  title           String
+  summary         String
+  createdAt       DateTime          @default(now())
+  organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model ApiKey {
+  id              String            @id @default(cuid())
+  organizationId  String
+  userId          String
+  label           String
+  hashedKey       String
+  createdAt       DateTime          @default(now())
+  lastUsedAt      DateTime?
+  organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model BillingCustomer {
+  id               String           @id @default(cuid())
+  organizationId   String           @unique
+  providerCustomerId String         @unique
+  createdAt        DateTime         @default(now())
+  organization     Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id               String             @id @default(cuid())
+  organizationId   String
+  providerSubId    String             @unique
+  plan             String
+  status           SubscriptionStatus @default(TRIALING)
+  currentPeriodEnd DateTime?
+  createdAt        DateTime           @default(now())
+  organization     Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id               String         @id @default(cuid())
+  organizationId   String
+  actorUserId      String
+  action           String
+  metadataJson     String?
+  createdAt        DateTime       @default(now())
+  organization     Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  actor            User           @relation(fields: [actorUserId], references: [id], onDelete: Cascade)
+}
