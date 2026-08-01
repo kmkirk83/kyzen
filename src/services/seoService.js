@@ -123,10 +123,18 @@ function generateMetaRecommendations(topic, keywords) {
     `Discover everything about ${topic}. ` +
     `Explore ${keywords.slice(0, 3).join(', ')} and more — expert insights and research.`;
 
+  const slug = encodeURIComponent(
+    topic
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, ''),
+  );
+
   return {
     title: title.slice(0, 60),
     description: description.slice(0, 160),
-    canonicalUrl: `https://example.com/${topic.toLowerCase().replace(/\s+/g, '-')}`,
+    canonicalUrl: `https://example.com/${slug}`,
     recommendedH1: topic,
     structuredDataType: 'Article',
   };
