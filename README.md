@@ -52,7 +52,7 @@ The API will be available at `http://localhost:3000`.
 | `OPENAI_MAX_TOKENS` | `1024` | Max tokens per AI response |
 | `RATE_LIMIT_WINDOW_MS` | `900000` | Rate-limit window (ms) |
 | `RATE_LIMIT_MAX` | `100` | Max requests per window |
-| `CORS_ORIGIN` | `*` | Allowed CORS origin |
+| `CORS_ORIGIN` | `http://localhost:3000` (dev) | Comma-separated allowed CORS origins |
 
 ---
 
