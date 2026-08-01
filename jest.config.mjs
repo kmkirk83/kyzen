@@ -1,11 +1,10 @@
-import nextJest from "next/jest";
-import type { Config } from "jest";
+import nextJest from "next/jest.js";
 
 const createJestConfig = nextJest({
   dir: "./",
 });
 
-const config: Config = {
+const config = {
   clearMocks: true,
   collectCoverageFrom: [
     "app/**/*.{ts,tsx}",
@@ -13,6 +12,7 @@ const config: Config = {
     "!app/**/layout.tsx",
     "!app/**/not-found.tsx",
   ],
+  modulePathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
   },

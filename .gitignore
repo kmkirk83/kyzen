@@ -33,3 +33,6 @@ coverage
 *.log
 .tmp
 .tmp/
+
+# typescript
+*.tsbuildinfo
