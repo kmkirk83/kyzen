@@ -81,6 +81,7 @@ function buildCampaignBrief(topic, audience, channels, goal) {
   const sanitizedChannels = sanitizeChannels(channels);
   const finalChannels = sanitizedChannels.length ? sanitizedChannels : ['content', 'seo', 'social'];
   const scoredChannels = scoreChannels(finalChannels, goal);
+  const totalScore = scoredChannels.reduce((s, c) => s + c.score, 0) || 1;
 
   return {
     topic,
@@ -91,7 +92,7 @@ function buildCampaignBrief(topic, audience, channels, goal) {
     estimatedTimelineWeeks: 4,
     suggestedBudgetAllocation: scoredChannels.map((ch) => ({
       channel: ch.channel,
-      percentageShare: Math.round((ch.score / scoredChannels.reduce((s, c) => s + c.score, 0)) * 100),
+      percentageShare: Math.round((ch.score / totalScore) * 100),
     })),
   };
 }
