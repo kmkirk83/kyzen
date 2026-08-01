@@ -99,4 +99,9 @@ describe('generateMetaRecommendations', () => {
     expect(meta).toHaveProperty('recommendedH1');
     expect(meta).toHaveProperty('structuredDataType');
   });
+
+  it('slugifies and encodes canonical URL path segment', () => {
+    const meta = generateMetaRecommendations('Topic / One #1', ['keyword']);
+    expect(meta.canonicalUrl).toBe('https://example.com/topic-one-1');
+  });
 });

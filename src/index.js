@@ -27,7 +27,9 @@ app.use(
       if (!requestOrigin || allowedOrigins.has(requestOrigin)) {
         callback(null, true);
       } else {
-        callback(new Error(`CORS: origin '${requestOrigin}' is not allowed.`));
+        const corsError = new Error(`CORS: origin '${requestOrigin}' is not allowed.`);
+        corsError.status = 403;
+        callback(corsError);
       }
     },
     optionsSuccessStatus: 200,
