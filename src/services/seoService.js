@@ -58,15 +58,21 @@ function difficultyLabel(score) {
  * @returns {'Informational'|'Navigational'|'Transactional'|'Commercial'}
  */
 function detectIntent(keyword) {
-  const kw = keyword.toLowerCase();
+  const kw = String(keyword).toLowerCase();
 
   const transactionalTerms = ['buy', 'purchase', 'order', 'shop', 'cheap', 'price', 'deal', 'discount', 'sale'];
   const commercialTerms = ['best', 'top', 'review', 'compare', 'vs', 'versus', 'alternatives'];
   const navigationalTerms = ['login', 'sign in', 'official', 'website', 'site', 'account'];
 
-  if (transactionalTerms.some((t) => kw.includes(t))) return 'Transactional';
-  if (commercialTerms.some((t) => kw.includes(t))) return 'Commercial';
-  if (navigationalTerms.some((t) => kw.includes(t))) return 'Navigational';
+  const containsTerm = (term) => {
+    if (term.includes(' ')) return kw.includes(term);
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`\\b${escaped}\\b`).test(kw);
+  };
+
+  if (transactionalTerms.some(containsTerm)) return 'Transactional';
+  if (commercialTerms.some(containsTerm)) return 'Commercial';
+  if (navigationalTerms.some(containsTerm)) return 'Navigational';
   return 'Informational';
 }
 
