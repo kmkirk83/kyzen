@@ -1,149 +1,93 @@
 # Clarion
 
-> AI-powered middleware for marketing and SEO research.
+Clarion is a commercialization-focused foundation for an **AI Visibility Intelligence** platform. It is designed as a hosted, multi-tenant SaaS product that helps brands measure, monitor, and improve how they appear across AI assistants and generative search systems.
 
-Clarion is an Express.js middleware service that gives marketers and SEO
-practitioners instant access to keyword analysis, campaign planning, and
-AI-generated suggestions — all through a clean REST API.
+## What is included
 
----
+This repository now provides a production-oriented starting point for building and selling Clarion:
 
-## Features
+- Next.js 16 + TypeScript application baseline
+- Prisma data model for organizations, memberships, reports, billing, API keys, and audits
+- Environment readiness checks and operational API endpoints
+- Docker-ready standalone runtime configuration
+- CI, CodeQL, Dependabot, and release automation scaffolding
+- Commercialization docs for security, support, releases, and contribution workflows
 
-| Feature | Endpoint |
-|---|---|
-| Keyword SEO analysis | `GET /api/seo/analyze` · `POST /api/seo/analyze` |
-| Meta-tag recommendations | `POST /api/seo/meta` |
-| AI keyword suggestions | `POST /api/seo/suggestions` |
-| Campaign brief builder | `POST /api/marketing/campaign` |
-| AI marketing suggestions | `POST /api/marketing/suggestions` |
-| AI competitor insights | `POST /api/marketing/competitor-analysis` |
-| Health check | `GET /health` |
+## Product direction
 
----
+Clarion is optimized for the following rollout path:
 
-## Quick start
+1. **Hosted SaaS first** for commercial launch
+2. **Developer platform second** via a public API and future SDK/CLI packages
+3. **Enterprise distribution third** via Docker-based self-hosting
+
+## Local development
+
+### Requirements
+
+- Node.js 22+
+- npm 11+
+- PostgreSQL 15+
+
+### Setup
 
 ```bash
-# 1. Install dependencies
-npm install
-
-# 2. Copy and configure environment variables
-cp .env.example .env
-#    Add your OPENAI_API_KEY to .env
-
-# 3. Start the server
-npm start        # production
-npm run dev      # development (auto-reload with nodemon)
+cp /home/runner/work/Clarion/Clarion/.env.example /home/runner/work/Clarion/Clarion/.env
+npm ci
+npm run dev
 ```
 
-The API will be available at `http://localhost:3000`.
-
----
+Open `http://localhost:3000`.
 
 ## Environment variables
 
-| Variable | Default | Description |
-|---|---|---|
-| `PORT` | `3000` | HTTP port |
-| `NODE_ENV` | `development` | Node environment |
-| `OPENAI_API_KEY` | — | **Required for AI endpoints** |
-| `OPENAI_MODEL` | `gpt-4o-mini` | OpenAI model to use |
-| `OPENAI_MAX_TOKENS` | `1024` | Max tokens per AI response |
-| `RATE_LIMIT_WINDOW_MS` | `900000` | Rate-limit window (ms) |
-| `RATE_LIMIT_MAX` | `100` | Max requests per window |
-| `CORS_ORIGIN` | `http://localhost:3000` (dev) | Comma-separated allowed CORS origins |
+See `/home/runner/work/Clarion/Clarion/.env.example` for the expected runtime contract.
 
----
+Key integrations:
 
-## API reference
+- `DATABASE_URL` for PostgreSQL
+- `AUTH_SECRET` for production authentication/session security
+- `OPENAI_API_KEY` and/or `ANTHROPIC_API_KEY` for scoring workflows
+- `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` for billing
+- `SENTRY_DSN` for monitoring
 
-### SEO endpoints
+## Commands
 
-#### `GET /api/seo/analyze`
+- `npm run dev` — start local development server
+- `npm run build` — create production build
+- `npm run start` — run production server
+- `npm run lint` — run ESLint
+- `npm run typecheck` — run TypeScript checks
+- `npm run test` — run Jest tests
+- `npm run prisma:validate` — validate Prisma schema
+- `npm run check` — run lint, typecheck, test, and build
 
-Analyse keywords for difficulty, search intent, and summary stats.
+## HTTP endpoints
 
-| Query param | Type | Required | Description |
-|---|---|---|---|
-| `keywords` | string (comma-sep) | ✅ | Seed keywords |
-| `searchEngine` | string | | `google` · `bing` · `duckduckgo` · `yahoo` |
-| `locale` | string | | e.g. `en-US` (default) |
+- `GET /api/health` — liveness/status metadata
+- `GET /api/readiness` — environment and subsystem readiness report
 
-```bash
-curl "http://localhost:3000/api/seo/analyze?keywords=best+seo+tools,buy+sneakers&locale=en-US"
-```
+## Deployment target
 
-#### `POST /api/seo/analyze`
+The repository is configured for **hosted Next.js deployment with Docker-compatible standalone output**.
 
-Same as `GET` but accepts a JSON body.
+- For platform hosting, see `/home/runner/work/Clarion/Clarion/docs/runbooks/production.md`
+- For container builds, see `/home/runner/work/Clarion/Clarion/Dockerfile`
 
-```json
-{ "keywords": ["best seo tools", "buy sneakers"], "searchEngine": "google" }
-```
+## Release and governance
 
-#### `POST /api/seo/meta`
+- Versioning is semver-based and managed with Release Please
+- Changelog entries are maintained in `/home/runner/work/Clarion/Clarion/CHANGELOG.md`
+- Security reporting guidance is in `/home/runner/work/Clarion/Clarion/SECURITY.md`
+- Contribution rules are in `/home/runner/work/Clarion/Clarion/CONTRIBUTING.md`
+- Code ownership is defined in `/home/runner/work/Clarion/Clarion/CODEOWNERS`
 
-Generate title, meta description, and structured-data recommendations.
+## Architecture references
 
-```json
-{ "topic": "digital marketing", "keywords": ["seo", "ppc", "content"] }
-```
+- `/home/runner/work/Clarion/Clarion/docs/architecture.md`
+- `/home/runner/work/Clarion/Clarion/docs/adr/0001-hosted-saas-first.md`
+- `/home/runner/work/Clarion/Clarion/docs/privacy-data-processing.md`
 
-#### `POST /api/seo/suggestions` *(requires `OPENAI_API_KEY`)*
+## Commercial distribution notes
 
-AI-generated long-tail keyword suggestions, intent analysis, and content ideas.
-
-```json
-{ "keywords": ["ai marketing tools"], "locale": "en-US" }
-```
-
----
-
-### Marketing endpoints
-
-#### `POST /api/marketing/campaign`
-
-Build a channel-scored campaign brief.
-
-```json
-{
-  "topic": "AI-powered SEO platform",
-  "audience": "marketing managers",
-  "channels": ["email", "seo", "content"],
-  "goal": "leads"
-}
-```
-
-Valid goals: `awareness` · `leads` · `sales` · `retention`
-
-#### `POST /api/marketing/suggestions` *(requires `OPENAI_API_KEY`)*
-
-AI-generated campaign messaging, channel tactics, and KPIs.
-
-```json
-{ "topic": "SEO SaaS", "audience": "SMB marketers", "channels": ["email", "social"] }
-```
-
-#### `POST /api/marketing/competitor-analysis` *(requires `OPENAI_API_KEY`)*
-
-AI-generated competitive landscape insights and positioning recommendations.
-
-```json
-{ "industry": "SaaS CRM", "competitors": ["Salesforce", "HubSpot"] }
-```
-
----
-
-## Running tests
-
-```bash
-npm test
-npm run test:coverage
-```
-
----
-
-## License
-
-MIT
+The root application remains private because it is a deployable SaaS product, not a library package. Future developer-platform distribution should be added as separate publishable packages (for example `packages/sdk` and `packages/cli`) once the public API contract is finalized.
