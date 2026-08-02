@@ -1,0 +1,42 @@
+# CodeRabbit configuration
+# https://docs.coderabbit.ai/guides/configure-coderabbit
+
+language: en-US
+
+reviews:
+  # Automatically request reviews on every PR
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+
+  # Auto-review all PRs including drafts
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - main
+
+  # Path-specific review instructions
+  path_instructions:
+    - path: "src/**"
+      instructions: |
+        Review for Next.js and React best practices.
+        Ensure server/client component boundaries are respected.
+        Flag any missing input validation or unsafe data handling.
+    - path: "src/app/api/**"
+      instructions: |
+        Strictly review API routes for input validation using Zod schemas.
+        Check for proper error handling and HTTP status codes.
+        Flag any missing authentication or authorization checks.
+    - path: "prisma/**"
+      instructions: |
+        Review schema changes for data integrity, missing indexes, and migration safety.
+    - path: "**/*.test.*"
+      instructions: |
+        Ensure tests cover edge cases and unhappy paths.
+        Check that mocks are cleaned up and tests are isolated.
+
+chat:
+  auto_reply: true
