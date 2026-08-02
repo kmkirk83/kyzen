@@ -41,24 +41,34 @@ const update: TelegramUpdate = {
   },
 };
 
+function mockJsonResponse(body: unknown, status = 200) {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    json: async () => body,
+  } as Response;
+}
+
 describe("processTelegramCopilotUpdate", () => {
+  beforeEach(() => {
+    global.fetch = jest.fn() as typeof fetch;
+  });
+
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
   it("routes Telegram messages through the configured OpenAI provider", async () => {
-    const fetchMock = jest
-      .spyOn(global, "fetch")
-      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }))
+    const fetchMock = global.fetch as jest.MockedFunction<typeof fetch>;
+
+    fetchMock
+      .mockResolvedValueOnce(mockJsonResponse({ ok: true }))
       .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({
-            choices: [{ message: { content: "Here are the current release blockers." } }],
-          }),
-          { status: 200 },
-        ),
+        mockJsonResponse({
+          choices: [{ message: { content: "Here are the current release blockers." } }],
+        }),
       )
-      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+      .mockResolvedValueOnce(mockJsonResponse({ ok: true }));
 
     const result = await processTelegramCopilotUpdate({ env: baseEnv, update });
 
@@ -82,9 +92,8 @@ describe("processTelegramCopilotUpdate", () => {
   });
 
   it("blocks unauthorized chats when TELEGRAM_ALLOWED_CHAT_IDS is configured", async () => {
-    const fetchMock = jest
-      .spyOn(global, "fetch")
-      .mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    const fetchMock = global.fetch as jest.MockedFunction<typeof fetch>;
+    fetchMock.mockResolvedValue(mockJsonResponse({ ok: true }));
 
     const result = await processTelegramCopilotUpdate({
       env: { ...baseEnv, TELEGRAM_ALLOWED_CHAT_IDS: "999,1000" },
@@ -100,9 +109,8 @@ describe("processTelegramCopilotUpdate", () => {
   });
 
   it("returns the help text for Telegram bot commands", async () => {
-    const fetchMock = jest
-      .spyOn(global, "fetch")
-      .mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    const fetchMock = global.fetch as jest.MockedFunction<typeof fetch>;
+    fetchMock.mockResolvedValue(mockJsonResponse({ ok: true }));
 
     const result = await processTelegramCopilotUpdate({
       env: baseEnv,
@@ -120,11 +128,12 @@ describe("processTelegramCopilotUpdate", () => {
   });
 
   it("sends a fallback error message when the provider call fails", async () => {
-    const fetchMock = jest
-      .spyOn(global, "fetch")
-      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }))
-      .mockResolvedValueOnce(new Response(JSON.stringify({ error: "boom" }), { status: 500 }))
-      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    const fetchMock = global.fetch as jest.MockedFunction<typeof fetch>;
+
+    fetchMock
+      .mockResolvedValueOnce(mockJsonResponse({ ok: true }))
+      .mockResolvedValueOnce(mockJsonResponse({ error: "boom" }, 500))
+      .mockResolvedValueOnce(mockJsonResponse({ ok: true }));
 
     const result = await processTelegramCopilotUpdate({ env: baseEnv, update });
 
