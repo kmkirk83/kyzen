@@ -1,0 +1,19 @@
+name: Auto Approve
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  auto_approve:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto Approve
+        uses: hmarr/auto-approve-action@v4
+        with:
+          github-token: ${{ secrets.AUTO_APPROVE_TOKEN }}
