@@ -47,7 +47,8 @@ Key integrations:
 
 - `DATABASE_URL` for PostgreSQL
 - `AUTH_SECRET` for production authentication/session security
-- `OPENAI_API_KEY` and/or `ANTHROPIC_API_KEY` for scoring workflows
+- `OPENAI_API_KEY` and/or `ANTHROPIC_API_KEY` for scoring workflows and the Telegram copilot connector
+- `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET` for the Telegram bot webhook
 - `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` for billing
 - `SENTRY_DSN` for monitoring
 
@@ -66,6 +67,17 @@ Key integrations:
 
 - `GET /api/health` — liveness/status metadata
 - `GET /api/readiness` — environment and subsystem readiness report
+- `POST /api/integrations/telegram` — Telegram webhook that relays chat requests to the configured copilot provider
+
+## Telegram copilot connector
+
+1. Create a Telegram bot with BotFather and capture the bot token.
+2. Set `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, and either `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` in `/home/runner/work/Clarion/Clarion/.env`.
+3. Optionally set `TELEGRAM_ALLOWED_CHAT_IDS` to a comma-separated allowlist of Telegram chat IDs.
+4. Point Telegram at `https://<your-domain>/api/integrations/telegram` and send the same secret value in the `X-Telegram-Bot-Api-Secret-Token` header when you register the webhook.
+5. Message the bot with a plain-text task or `/help` to confirm the connector is online.
+
+The connector is stateless and replies with the configured provider response, so it works best for task intake, drafting, and lightweight operational requests.
 
 ## Deployment target
 
