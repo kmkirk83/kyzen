@@ -79,6 +79,10 @@ Key integrations:
 
 The connector is stateless and replies with the configured provider response, so it works best for task intake, drafting, and lightweight operational requests.
 
+## Standalone marketplace repo seed
+
+If you want to publish the Telegram connector from its own public repository for marketplace listing, start from `/home/runner/work/Clarion/Clarion/marketplace/telegram-copilot-connector`. That directory contains a standalone repo scaffold with the webhook source, setup docs, support/privacy stubs, and package metadata that can be copied into a new GitHub repository.
+
 ## Deployment target
 
 The repository is configured for **hosted Next.js deployment with Docker-compatible standalone output**.
