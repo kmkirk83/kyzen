@@ -22,7 +22,7 @@ const update: TelegramUpdate = {
     chat: {
       id: 123,
       type: "private",
-      username: "clarion-user",
+      username: "telepilot-user",
     },
     from: {
       id: 456,

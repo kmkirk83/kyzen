@@ -3,7 +3,7 @@ import type { AppEnv } from "./env";
 const DEFAULT_OPENAI_MODEL = "gpt-4o-mini";
 const DEFAULT_ANTHROPIC_MODEL = "claude-3-5-haiku-latest";
 const DEFAULT_SYSTEM_PROMPT =
-  "You are the Clarion Telegram Copilot connector. Help the user complete software and product tasks. Be concise, action-oriented, and explicit about any missing context or risks.";
+  "You are Telepilot. Help the user complete software and product tasks. Be concise, action-oriented, and explicit about any missing context or risks.";
 
 type OpenAiChatCompletionResponse = {
   choices?: Array<{

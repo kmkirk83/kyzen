@@ -1,6 +1,6 @@
 # Privacy and Data Processing
 
-This connector receives Telegram webhook payloads and forwards plain-text message content to the configured AI provider to generate a reply.
+Telepilot receives Telegram webhook payloads and forwards plain-text message content to the configured AI provider to generate a reply.
 
 ## Data handled
 

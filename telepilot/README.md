@@ -1,6 +1,6 @@
-# Clarion Telegram Copilot Connector
+# Telepilot
 
-This directory is a standalone public-repository seed for the Clarion Telegram connector. Copy these files into a new GitHub repository when you are ready to publish the connector separately from the private Clarion SaaS codebase and list it in a marketplace.
+This directory is a standalone public-repository seed for a completely separate GitHub repository named `telepilot`. Copy these files into a new repository root to publish the connector independently.
 
 ## What it includes
 
@@ -8,7 +8,7 @@ This directory is a standalone public-repository seed for the Clarion Telegram c
 - Telegram chat allowlist support
 - OpenAI and Anthropic reply providers
 - Marketplace-friendly docs for setup, support, and privacy
-- Apache 2.0 license copied from the main project
+- Apache 2.0 license
 
 ## Quick start
 
@@ -38,14 +38,14 @@ Send the same secret in the `X-Telegram-Bot-Api-Secret-Token` header when creati
 
 Before publishing this as its own repository:
 
-1. Create a new public GitHub repository.
+1. Create a new public GitHub repository named `telepilot`.
 2. Copy the contents of this directory into that repository root.
 3. Add repository description, logo, screenshots, and listing copy.
 4. Link `docs/privacy.md` and `SUPPORT.md` from the marketplace listing.
-5. Replace any Clarion-specific branding or support details that should differ in the public listing.
+5. Publish your final terms, support contact, and marketplace assets.
 
 ## Support and policy docs
 
 - Support: `SUPPORT.md`
 - Privacy: `docs/privacy.md`
-- Security: use the parent repository's `SECURITY.md` or add a connector-specific policy before publishing
+- Security: `SECURITY.md`

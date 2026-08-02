@@ -81,7 +81,7 @@ The connector is stateless and replies with the configured provider response, so
 
 ## Standalone marketplace repo seed
 
-If you want to publish the Telegram connector from its own public repository for marketplace listing, start from `/home/runner/work/Clarion/Clarion/marketplace/telegram-copilot-connector`. That directory contains a standalone repo scaffold with the webhook source, setup docs, support/privacy stubs, and package metadata that can be copied into a new GitHub repository.
+If you want to publish the Telegram connector as a completely separate public repository named `telepilot`, start from `/home/runner/work/Clarion/Clarion/telepilot`. That directory contains a standalone repo scaffold with independent package metadata, webhook source, and support/privacy/security docs that can be copied into a new GitHub repository.
 
 ## Deployment target
 

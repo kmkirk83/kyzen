@@ -10,7 +10,7 @@ import {
 } from "./telegram";
 
 const HELP_MESSAGE = [
-  "Clarion Copilot is ready.",
+  "Telepilot is ready.",
   "",
   "Send any plain-text task and I will route it to the configured copilot provider.",
   "Optional commands:",
@@ -19,11 +19,11 @@ const HELP_MESSAGE = [
 ].join("\n");
 
 const ACCESS_DENIED_MESSAGE =
-  "This Telegram chat is not allowed to use Clarion Copilot. Add the chat ID to TELEGRAM_ALLOWED_CHAT_IDS to authorize it.";
+  "This Telegram chat is not allowed to use Telepilot. Add the chat ID to TELEGRAM_ALLOWED_CHAT_IDS to authorize it.";
 const INVALID_MESSAGE_MESSAGE =
-  "Send a plain-text task for Clarion Copilot to work on. Attachments and empty messages are ignored.";
+  "Send a plain-text task for Telepilot to work on. Attachments and empty messages are ignored.";
 const FAILURE_MESSAGE =
-  "Clarion Copilot could not process that request right now. Check the provider credentials and try again.";
+  "Telepilot could not process that request right now. Check the provider credentials and try again.";
 
 export async function processTelegramCopilotUpdate({
   env,

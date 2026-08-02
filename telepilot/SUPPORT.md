@@ -1,6 +1,6 @@
 # Support
 
-Use GitHub Issues in the public connector repository for bug reports and setup questions.
+Use GitHub Issues in the public `telepilot` repository for bug reports and setup questions.
 
 When filing an issue, include:
 
