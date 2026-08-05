@@ -6,6 +6,7 @@
  * Centralised error handling for the Clarion API.
  */
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function errorHandler(err, req, res, _next) {
   const status = err.status || err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
