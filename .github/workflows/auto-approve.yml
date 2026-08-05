@@ -1,7 +1,7 @@
 name: Auto Approve
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
@@ -12,8 +12,14 @@ jobs:
   auto_approve:
     if: ${{ !github.event.pull_request.head.repo.fork }}
     runs-on: ubuntu-latest
+    env:
+      AUTO_APPROVE_TOKEN: ${{ secrets.AUTO_APPROVE_TOKEN }}
     steps:
       - name: Auto Approve
-        uses: hmarr/auto-approve-action@v4
+        if: ${{ env.AUTO_APPROVE_TOKEN != '' }}
+        uses: hmarr/auto-approve-action@v4.0.0
         with:
-          github-token: ${{ secrets.AUTO_APPROVE_TOKEN }}
+          github-token: ${{ env.AUTO_APPROVE_TOKEN }}
+      - name: Skip when no approval token is configured
+        if: ${{ env.AUTO_APPROVE_TOKEN == '' }}
+        run: echo "AUTO_APPROVE_TOKEN is not configured; skipping auto-approval."
