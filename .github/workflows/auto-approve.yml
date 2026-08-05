@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   auto_approve:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     runs-on: ubuntu-latest
     env:
       AUTO_APPROVE_TOKEN: ${{ secrets.AUTO_APPROVE_TOKEN }}

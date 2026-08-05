@@ -21,6 +21,15 @@ export function getReadinessReport() {
       description: "At least one AI provider key is configured for scoring workflows.",
     },
     {
+      name: "telegramConnector",
+      configured: Boolean(
+        env?.TELEGRAM_BOT_TOKEN &&
+          env?.TELEGRAM_WEBHOOK_SECRET &&
+          (env?.OPENAI_API_KEY || env?.ANTHROPIC_API_KEY),
+      ),
+      description: "Telegram bot credentials and a copilot provider are configured.",
+    },
+    {
       name: "billing",
       configured: Boolean(env?.STRIPE_SECRET_KEY && env?.STRIPE_WEBHOOK_SECRET),
       description: "Stripe billing and webhook secrets are ready.",
