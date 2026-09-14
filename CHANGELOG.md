@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1](https://github.com/kmkirk83/kyzen/compare/clarion-ai-visibility-v0.2.0...clarion-ai-visibility-v0.2.1) (2026-08-05)
+
+
+### Bug Fixes
+
+* migrate DATABASE_URL to prisma.config.ts for Prisma 7 compatibility ([69dd455](https://github.com/kmkirk83/kyzen/commit/69dd455a77bbb050e48a1883089576d6e4017630))
+* migrate DATABASE_URL to prisma.config.ts for Prisma 7 compatibility ([8ad9990](https://github.com/kmkirk83/kyzen/commit/8ad9990090a24a3b372ca25471b8dd0fbc3b1834))
+* use non-null assertion for DATABASE_URL in prisma.config.ts ([cc4e145](https://github.com/kmkirk83/kyzen/commit/cc4e1451299c84c7942f6d620b1beda516e387e8))
+
 ## [0.2.0](https://github.com/kmkirk83/kyzen/compare/clarion-ai-visibility-v0.1.0...clarion-ai-visibility-v0.2.0) (2026-08-05)
 
 
