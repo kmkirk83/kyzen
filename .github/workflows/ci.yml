@@ -16,7 +16,7 @@ permissions:
 jobs:
   validate:
     name: Lint, Typecheck, Test, Build
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]  # use self-hosted when registered; otherwise change back to ubuntu-latest after billing unlock
     timeout-minutes: 15
     env:
       # Dummy DATABASE_URL so Prisma validate/generate does not fail in CI
