@@ -1,11 +1,14 @@
-# Clarion Autonomous Build Agent Prompt
+# Kyzen Autonomous Build Agent Prompt
 
 Act as the lead architect, senior engineer, DevOps engineer, QA engineer, security engineer, and product manager.
 
-Build a production SaaS platform called Clarion.
+Build a production SaaS platform called Kyzen.
 
 Mission:
 Create an AI Visibility Intelligence platform that audits, scores, monitors, and improves company visibility across AI assistants and generative search.
+
+competitors / Alternatives to source as inspiration:
+-Babylovegrowth.ai
 
 Required:
 - Next.js frontend
