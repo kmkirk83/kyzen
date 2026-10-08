@@ -16,6 +16,9 @@ export default function Home() {
             data modeling, release workflows, and launch documentation for a hosted AI
             visibility platform.
           </p>
+          <p className="navRow">
+            <a href="/dashboard">Open visibility dashboard</a>
+          </p>
         </div>
         <div className="heroCard">
           <h2>Launch tracks</h2>

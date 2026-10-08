@@ -31,7 +31,7 @@ npm ci
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open `http://localhost:3000`. The visibility dashboard is at `/dashboard` and uses the sample catalog until live tenant queries are connected.
 
 ## Environment Variables
 
@@ -62,6 +62,7 @@ See `.env.example` for the full contract. Key integrations include:
 - `GET /api/health` — liveness
 - `GET /api/readiness` — environment and subsystem readiness
 - `POST /api/integrations/telegram` — Telegram webhook relay
+- `GET /api/visibility/summary` — sample visibility contract used by `/dashboard`
 
 ## Telegram Copilot Connector
 

@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2026-10-08
+
+### Added
+- Visibility dashboard at `/dashboard` with share-of-answer, citation quality, and sentiment cards.
+- `GET /api/visibility/summary` returning the same sample contract the dashboard renders.
+- Unit test for the visibility summary contract.
+- Feature flag note `VISIBILITY_SAMPLE_DATA` so sample data is not mistaken for live tenant results.
+
+### Notes
+- Live Prisma tenant queries are not wired to this endpoint. Database-backed reports remain a follow-up.
+
 ## [0.2.1](https://github.com/kmkirk83/kyzen/compare/clarion-ai-visibility-v0.2.0...clarion-ai-visibility-v0.2.1) (2026-08-05)
 
 

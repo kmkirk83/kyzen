@@ -136,3 +136,18 @@ a {
     padding-top: 2.5rem;
   }
 }
+
+.navRow {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin: 1.5rem 0 0;
+  color: var(--accent);
+}
+
+.score {
+  margin: 0.5rem 0 0;
+  font-size: 4rem;
+  line-height: 1;
+  color: var(--accent-strong);
+}
