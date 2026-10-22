@@ -133,3 +133,83 @@ a:hover { text-decoration: underline; }
 .howSection p { color: var(--muted); line-height: 1.6; }
 .howSection ul { color: var(--muted); line-height: 1.55; }
 .howSection code { color: var(--accent); font-size: 0.85em; }
+
+/* Info dots */
+.labelWithInfo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.infoWrap {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+}
+.infoDot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  font-style: normal;
+  line-height: 1;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  flex-shrink: 0;
+}
+.infoDot:hover,
+.infoWrap.open .infoDot {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.infoPanel {
+  position: absolute;
+  z-index: 30;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  width: min(260px, 70vw);
+  padding: 0.75rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #0b1220;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: normal;
+  text-transform: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+.infoPanel strong {
+  display: block;
+  color: var(--foreground);
+  margin-bottom: 0.35rem;
+  font-size: 0.8rem;
+}
+.infoWrap.open .infoPanel,
+.infoWrap:hover .infoPanel,
+.infoWrap:focus-within .infoPanel {
+  opacity: 1;
+  pointer-events: auto;
+}
+/* Keep panels readable near edges */
+.pillarCard .infoPanel,
+.surfaceCard .infoPanel {
+  left: 0;
+  transform: none;
+}
+.metricList .infoPanel {
+  left: 0;
+  transform: none;
+  width: min(240px, 65vw);
+}
