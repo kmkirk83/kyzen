@@ -1,8 +1,16 @@
-export type VisibilitySurface = {
-  surface: string;
-  shareOfAnswer: number;
-  citationQuality: number;
-  sentiment: "positive" | "neutral" | "mixed";
+export type SurfaceKey = "answer_engines" | "assistants" | "search_overviews";
+
+export type SurfaceScore = {
+  key: SurfaceKey;
+  label: string;
+  /** 0-100 presence in AI answers */
+  coverage: number;
+  /** 0-100 how often cited with quality */
+  trust: number;
+  /** 0-100 tone favorability */
+  sentiment: number;
+  /** derived composite for this surface */
+  score: number;
 };
 
 export type VisibilitySummary = {
@@ -11,34 +19,62 @@ export type VisibilitySummary = {
   organization: string;
   brand: string;
   generatedAt: string;
+  /** Single headline score 0-100 */
   overallScore: number;
-  surfaces: VisibilitySurface[];
+  /** Three simple pillars that explain the headline */
+  pillars: {
+    coverage: number;
+    trust: number;
+    sentiment: number;
+  };
+  surfaces: SurfaceScore[];
+  trend: "up" | "flat" | "down";
   notes: string[];
 };
 
-const SAMPLE_SURFACES: VisibilitySurface[] = [
-  { surface: "Answer engines", shareOfAnswer: 42, citationQuality: 71, sentiment: "positive" },
-  { surface: "Conversational assistants", shareOfAnswer: 36, citationQuality: 64, sentiment: "mixed" },
-  { surface: "Search overviews", shareOfAnswer: 51, citationQuality: 78, sentiment: "positive" },
+function clamp(n: number) {
+  return Math.max(0, Math.min(100, Math.round(n)));
+}
+
+/** Weighted composite: coverage 40%, trust 40%, sentiment 20% */
+export function compositeScore(coverage: number, trust: number, sentiment: number) {
+  return clamp(coverage * 0.4 + trust * 0.4 + sentiment * 0.2);
+}
+
+const SAMPLE: Array<Omit<SurfaceScore, "score">> = [
+  { key: "answer_engines", label: "Answer engines", coverage: 42, trust: 71, sentiment: 78 },
+  { key: "assistants", label: "Assistants", coverage: 36, trust: 64, sentiment: 58 },
+  { key: "search_overviews", label: "Search overviews", coverage: 51, trust: 78, sentiment: 82 },
 ];
 
 export function buildVisibilitySummary(generatedAt = new Date().toISOString()): VisibilitySummary {
-  const overallScore = Math.round(
-    SAMPLE_SURFACES.reduce((total, item) => total + (item.shareOfAnswer + item.citationQuality) / 2, 0) /
-      SAMPLE_SURFACES.length,
-  );
+  const surfaces: SurfaceScore[] = SAMPLE.map((s) => ({
+    ...s,
+    score: compositeScore(s.coverage, s.trust, s.sentiment),
+  }));
+
+  const pillars = {
+    coverage: clamp(surfaces.reduce((t, s) => t + s.coverage, 0) / surfaces.length),
+    trust: clamp(surfaces.reduce((t, s) => t + s.trust, 0) / surfaces.length),
+    sentiment: clamp(surfaces.reduce((t, s) => t + s.sentiment, 0) / surfaces.length),
+  };
+
+  const overallScore = compositeScore(pillars.coverage, pillars.trust, pillars.sentiment);
 
   return {
     source: "sample",
     featureFlag: "VISIBILITY_SAMPLE_DATA",
     organization: "Sample workspace",
-    brand: "Clarion",
+    brand: "kyzen",
     generatedAt,
     overallScore,
-    surfaces: SAMPLE_SURFACES,
+    pillars,
+    surfaces,
+    trend: "up",
     notes: [
-      "Sample catalog is enabled so the dashboard and API work without a database.",
-      "Live tenant queries remain behind DATABASE_URL and are not yet wired to this endpoint.",
+      "Scores use a simple weighted model: coverage 40%, trust 40%, sentiment 20%.",
+      "Sample data — no database or API keys required to evaluate the product surface.",
+      "Live tenant queries are the main remaining integration step.",
     ],
   };
 }
