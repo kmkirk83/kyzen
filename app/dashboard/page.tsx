@@ -148,7 +148,7 @@ export default function DashboardPage() {
       </aside>
 
       <main className="dashMain">
-        <section className="scoreHero">
+        <section className="plane plane-raised scoreHero">
           <div>
             <p className="chip">
               <LabelWithInfo infoKey="visibility">Visibility score</LabelWithInfo>
