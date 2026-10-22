@@ -1,29 +1,38 @@
 # Kyzen
 
-Commercialization-focused foundation for an **AI Visibility Intelligence** platform. Kyzen is designed as a hosted, multi-tenant SaaS product that helps brands measure, monitor, and improve their visibility across AI and search surfaces.
+**AI Visibility Intelligence platform foundation** — multi-tenant SaaS for measuring and improving brand visibility across AI answers and search.
 
-## What Is Included
+Built for commercialization: hosted SaaS first, developer platform second, enterprise self-hosting third.
 
-- Next.js 16 + TypeScript application baseline
-- Prisma data model for organizations, memberships, reports, billing, API keys, and audits
+## Live demo (sample data)
+
+Once deployed, evaluate without cloning:
+
+- Buyer quick start: `/start`
+- Visibility dashboard: `/dashboard` (sample data, no API keys required)
+
+Public demo project: `kyzen-demo` on Vercel (see latest deployment in the Vercel dashboard).
+
+## What is included
+
+- Next.js 16 + TypeScript application
+- Prisma multi-tenant model (organizations, memberships, reports, billing, API keys, audits)
+- Working visibility dashboard with honest sample-data mode and onboarding guidance
 - Environment readiness checks and operational API endpoints
-- Docker-ready standalone runtime configuration
+- Docker-ready standalone configuration
 - CI, CodeQL, Dependabot, and release automation scaffolding
-- Commercialization documentation for security, support, releases, and contribution workflows
+- Commercialization documentation (security, support, releases, contribution)
 
-## Product Direction
+## For buyers / evaluators
 
-1. **Hosted SaaS first** — commercial launch focus
-2. **Developer platform second** — public API and future SDK/CLI packages
-3. **Enterprise distribution third** — Docker-based self-hosting
+1. Open `/start` for the guided evaluation path.
+2. Open `/dashboard` to see the product surface on sample data.
+3. Review `prisma/schema.prisma` for the multi-tenant commercial model.
+4. Hit `GET /api/visibility/summary` and `GET /api/health`.
 
-## Requirements
+**Scope boundary:** Live tenant queries are the main remaining integration step. The dashboard and API contract are intentionally runnable without a database or provider keys so you can evaluate quickly.
 
-- Node.js 22+
-- npm 11+
-- PostgreSQL 15+
-
-## Local Development
+## Local development
 
 ```bash
 cp .env.example .env
@@ -31,60 +40,35 @@ npm ci
 npm run dev
 ```
 
-Open `http://localhost:3000`. The visibility dashboard is at `/dashboard` and uses the sample catalog until live tenant queries are connected.
+Open `http://localhost:3000/start` then `/dashboard`.
 
-## Environment Variables
+**Requirements:** Node.js 22+, npm 11+, PostgreSQL 15+ (only needed for live tenant wiring).
 
-See `.env.example` for the full contract. Key integrations include:
+## Environment variables
 
-- `DATABASE_URL` — PostgreSQL connection
-- `AUTH_SECRET` — session security
-- `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` — scoring and Telegram copilot
-- `TELEGRAM_BOT_TOKEN` / `TELEGRAM_WEBHOOK_SECRET` — Telegram connector
-- `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` — billing
-- `SENTRY_DSN` — monitoring
+See `.env.example`. Most variables are optional for the sample-data evaluation path. Set `DEMO_MODE=true` to force demo messaging.
 
-## Available Commands
+## Commands
 
-| Command              | Description                          |
-|----------------------|--------------------------------------|
-| `npm run dev`        | Start development server             |
-| `npm run build`      | Production build                     |
-| `npm run start`      | Run production server                |
-| `npm run lint`       | ESLint                               |
-| `npm run typecheck`  | TypeScript checks                    |
-| `npm run test`       | Jest tests                           |
-| `npm run prisma:validate` | Validate Prisma schema          |
-| `npm run check`      | Lint + typecheck + test + build      |
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run start` | Production server |
+| `npm run check` | Lint + typecheck + test + build |
+| `npm run prisma:validate` | Validate Prisma schema |
 
-## HTTP Endpoints
+## HTTP endpoints
 
 - `GET /api/health` — liveness
-- `GET /api/readiness` — environment and subsystem readiness
-- `POST /api/integrations/telegram` — Telegram webhook relay
+- `GET /api/readiness` — environment readiness
 - `GET /api/visibility/summary` — sample visibility contract used by `/dashboard`
+- `POST /api/integrations/telegram` — Telegram webhook relay
 
-## Telegram Copilot Connector
+## Transfer / commercial terms (summary)
 
-1. Create a bot via BotFather and obtain the token.
-2. Configure the relevant environment variables.
-3. Optionally restrict access with `TELEGRAM_ALLOWED_CHAT_IDS`.
-4. Point the webhook at `https://<your-domain>/api/integrations/telegram`.
-
-A standalone seed for a separate `telepilot` repository is available under the `telepilot/` directory.
-
-## Deployment
-
-The application is configured for hosted Next.js deployment with Docker-compatible standalone output. See:
-
-- `docs/runbooks/production.md`
-- `Dockerfile`
-
-## Governance
-
-- Semantic versioning via Release Please
-- `CHANGELOG.md`, `SECURITY.md`, `CONTRIBUTING.md`, and `CODEOWNERS` are present
+See `SALES.md` for the full sale package: asking range, Escrow transfer, what is included, and support window.
 
 ## License
 
-See the [LICENSE](LICENSE) file.
+See [LICENSE](LICENSE).
