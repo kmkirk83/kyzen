@@ -1,3 +1,9 @@
+## Live demo
+
+- Dashboard: https://kyzen-demo-kmkirk83s-projects.vercel.app/dashboard
+- Quick start: https://kyzen-demo-kmkirk83s-projects.vercel.app/start
+- Toggle **Sample** vs **Seeded** on the dashboard (no DATABASE_URL required for either mode).
+
 # kyzen — Sale Package
 
 ## Asset
