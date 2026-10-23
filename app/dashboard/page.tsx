@@ -1,42 +1,48 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 
-import { buildVisibilitySummary } from "@/lib/visibility-summary";
+import {
+  buildVisibilitySummary,
+  type DataMode,
+  type Improvement,
+} from "@/lib/visibility-summary";
 
 const CATEGORY_INFO = {
   visibility: {
     title: "Visibility score",
-    body: "A single 0–100 headline for how present and well-regarded your brand is across AI answer surfaces. It is the same weighted model used on each surface: coverage 40%, trust 40%, sentiment 20%.",
+    body: "A single 0–100 headline for how present and well-regarded your brand is across AI answer surfaces. Weighted: coverage 40%, trust 40%, sentiment 20%.",
   },
   coverage: {
     title: "Coverage",
-    body: "How often your brand appears in AI-generated answers for relevant queries. Higher coverage means you show up more frequently when people ask AI tools about your category.",
+    body: "How often your brand appears in AI-generated answers for relevant queries.",
   },
   trust: {
     title: "Trust",
-    body: "How strongly and cleanly you are cited when you do appear. Higher trust means answers reference you with clearer, higher-quality attribution rather than vague or weak mentions.",
+    body: "How strongly and cleanly you are cited when you appear.",
   },
   sentiment: {
     title: "Sentiment",
-    body: "The tone of mentions about your brand in AI answers. Higher sentiment means more favorable framing; lower scores reflect neutral or mixed portrayal.",
+    body: "The tone of mentions about your brand in AI answers.",
   },
   answer_engines: {
     title: "Answer engines",
-    body: "AI systems that return direct answers (for example overview-style answer boxes). Scores here reflect presence, citation quality, and tone in those answer formats.",
+    body: "AI systems that return direct answers (overview-style answer boxes).",
   },
   assistants: {
     title: "Assistants",
-    body: "Conversational AI assistants where users ask follow-up questions. Scores reflect how you appear in multi-turn, chat-style responses.",
+    body: "Conversational AI assistants where users ask follow-up questions.",
   },
   search_overviews: {
     title: "Search overviews",
-    body: "AI-generated overviews embedded in search results. Scores reflect visibility when users discover answers inside search, not only in standalone chat tools.",
+    body: "AI-generated overviews embedded in search results.",
   },
 } as const;
 
 type InfoKey = keyof typeof CATEGORY_INFO;
+const CHECKLIST_KEY = "kyzen-improvement-checklist";
+const MODE_KEY = "kyzen-data-mode";
 
 function scoreTone(n: number) {
   if (n >= 70) return "good";
@@ -48,7 +54,6 @@ function InfoTip({ infoKey }: { infoKey: InfoKey }) {
   const tip = CATEGORY_INFO[infoKey];
   const panelId = useId();
   const [open, setOpen] = useState(false);
-
   return (
     <span className={`infoWrap ${open ? "open" : ""}`}>
       <button
@@ -77,14 +82,12 @@ function InfoTip({ infoKey }: { infoKey: InfoKey }) {
 function LabelWithInfo({
   children,
   infoKey,
-  className = "",
 }: {
   children: React.ReactNode;
   infoKey: InfoKey;
-  className?: string;
 }) {
   return (
-    <span className={`labelWithInfo ${className}`.trim()}>
+    <span className="labelWithInfo">
       <span>{children}</span>
       <InfoTip infoKey={infoKey} />
     </span>
@@ -92,8 +95,20 @@ function LabelWithInfo({
 }
 
 export default function DashboardPage() {
-  const summary = buildVisibilitySummary("2026-10-22T00:00:00.000Z");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mode, setMode] = useState<DataMode>("sample");
+  const [done, setDone] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    try {
+      const m = localStorage.getItem(MODE_KEY) as DataMode | null;
+      if (m === "sample" || m === "seeded") setMode(m);
+      const raw = localStorage.getItem(CHECKLIST_KEY);
+      if (raw) setDone(JSON.parse(raw) as Record<string, boolean>);
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -101,6 +116,34 @@ export default function DashboardPage() {
       document.body.style.overflow = "";
     };
   }, [menuOpen]);
+
+  const summary = useMemo(
+    () => buildVisibilitySummary("2026-10-22T00:00:00.000Z", mode),
+    [mode],
+  );
+
+  function setModePersist(next: DataMode) {
+    setMode(next);
+    try {
+      localStorage.setItem(MODE_KEY, next);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function toggleDone(item: Improvement) {
+    setDone((prev) => {
+      const next = { ...prev, [item.id]: !prev[item.id] };
+      try {
+        localStorage.setItem(CHECKLIST_KEY, JSON.stringify(next));
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  }
+
+  const completedCount = summary.improvements.filter((i) => done[i.id]).length;
 
   return (
     <div className="dashRoot">
@@ -111,17 +154,35 @@ export default function DashboardPage() {
             {summary.organization} · {summary.brand}
           </span>
         </div>
-        <button
-          type="button"
-          className="hamburger"
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((v) => !v)}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
+        <div className="dashTopActions">
+          <div className="modeToggle" role="group" aria-label="Data mode">
+            <button
+              type="button"
+              className={mode === "sample" ? "active" : ""}
+              onClick={() => setModePersist("sample")}
+            >
+              Sample
+            </button>
+            <button
+              type="button"
+              className={mode === "seeded" ? "active" : ""}
+              onClick={() => setModePersist("seeded")}
+            >
+              Seeded
+            </button>
+          </div>
+          <button
+            type="button"
+            className="hamburger"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
       </header>
 
       <div
@@ -144,18 +205,20 @@ export default function DashboardPage() {
           <a href="/api/visibility/summary" onClick={() => setMenuOpen(false)}>API summary</a>
           <a href="/api/health" onClick={() => setMenuOpen(false)}>Health</a>
         </nav>
-        <p className="sideNote">Demo mode · sample data</p>
+        <p className="sideNote">
+          {mode === "seeded" ? "Seeded tenant snapshot" : "Sample data"} · no DB required
+        </p>
       </aside>
 
       <main className="dashMain">
         <section className="plane plane-raised scoreHero">
-          <div>
+          <div className="scoreHeroLeft">
             <p className="chip">
               <LabelWithInfo infoKey="visibility">Visibility score</LabelWithInfo>
             </p>
             <h1 className={`bigScore tone-${scoreTone(summary.overallScore)}`}>{summary.overallScore}</h1>
             <p className="scoreSub">
-              Weighted from coverage, trust, and sentiment across AI surfaces.
+              Weighted from coverage, trust, and sentiment. Mode: <strong>{summary.source}</strong>.
               Trend: <strong>{summary.trend}</strong>
             </p>
           </div>
@@ -208,35 +271,51 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        
         <section className="improveSection plane" aria-labelledby="improve-heading">
           <div className="improveHead">
             <h2 id="improve-heading">Recommended improvements</h2>
             <p className="improveLede">
-              Ranked actions based on the scores above. Each item explains why it matters and links to the next step.
+              Ranked from the scores above. Mark items done to track progress ({completedCount}/
+              {summary.improvements.length} complete).
             </p>
           </div>
           <ul className="improveList">
-            {summary.improvements.map((item) => (
-              <li key={item.id} className={`improveCard priority-${item.priority}`}>
-                <div className="improveTop">
-                  <span className={`priorityPill priority-${item.priority}`}>{item.priority}</span>
-                  <span className="impactTag">{item.impact}</span>
-                </div>
-                <h3>{item.title}</h3>
-                <p className="improveWhy">{item.why}</p>
-                <a
-                  className="improveCta"
-                  href={item.href}
-                  {...(item.href.startsWith("http")
-                    ? { target: "_blank", rel: "noopener noreferrer" }
-                    : {})}
+            {summary.improvements.map((item) => {
+              const isDone = Boolean(done[item.id]);
+              return (
+                <li
+                  key={item.id}
+                  className={`improveCard priority-${item.priority} ${isDone ? "isDone" : ""}`}
                 >
-                  {item.cta}
-                  <span aria-hidden="true">→</span>
-                </a>
-              </li>
-            ))}
+                  <div className="improveTop">
+                    <span className={`priorityPill priority-${item.priority}`}>{item.priority}</span>
+                    <span className="impactTag">{item.impact}</span>
+                  </div>
+                  <h3>{item.title}</h3>
+                  <p className="improveWhy">{item.why}</p>
+                  <div className="improveActions">
+                    <button
+                      type="button"
+                      className={`checkBtn ${isDone ? "checked" : ""}`}
+                      aria-pressed={isDone}
+                      onClick={() => toggleDone(item)}
+                    >
+                      {isDone ? "Done" : "Mark done"}
+                    </button>
+                    <a
+                      className="improveCta"
+                      href={item.href}
+                      {...(item.href.startsWith("http")
+                        ? { target: "_blank", rel: "noopener noreferrer" }
+                        : {})}
+                    >
+                      {item.cta}
+                      <span aria-hidden="true">→</span>
+                    </a>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </section>
 
@@ -244,7 +323,7 @@ export default function DashboardPage() {
           <h2>How scoring works</h2>
           <p>
             Each surface scores <code>coverage × 40% + trust × 40% + sentiment × 20%</code>.
-            The headline score is the same model on the averaged pillars.
+            Seeded mode swaps in a higher-fidelity in-repo tenant snapshot without DATABASE_URL.
           </p>
           <ul>
             {summary.notes.map((n) => (
