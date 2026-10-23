@@ -182,7 +182,7 @@ export default function DashboardPage() {
           <h2>By surface</h2>
           <div className="surfaceGrid">
             {summary.surfaces.map((s) => (
-              <article key={s.key} className="surfaceCard">
+              <article key={s.key} id={`surface-${s.key}`} className="surfaceCard">
                 <header>
                   <h3>
                     <LabelWithInfo infoKey={s.key}>{s.label}</LabelWithInfo>
@@ -206,6 +206,38 @@ export default function DashboardPage() {
               </article>
             ))}
           </div>
+        </section>
+
+        
+        <section className="improveSection plane" aria-labelledby="improve-heading">
+          <div className="improveHead">
+            <h2 id="improve-heading">Recommended improvements</h2>
+            <p className="improveLede">
+              Ranked actions based on the scores above. Each item explains why it matters and links to the next step.
+            </p>
+          </div>
+          <ul className="improveList">
+            {summary.improvements.map((item) => (
+              <li key={item.id} className={`improveCard priority-${item.priority}`}>
+                <div className="improveTop">
+                  <span className={`priorityPill priority-${item.priority}`}>{item.priority}</span>
+                  <span className="impactTag">{item.impact}</span>
+                </div>
+                <h3>{item.title}</h3>
+                <p className="improveWhy">{item.why}</p>
+                <a
+                  className="improveCta"
+                  href={item.href}
+                  {...(item.href.startsWith("http")
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
+                >
+                  {item.cta}
+                  <span aria-hidden="true">→</span>
+                </a>
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section className="howSection">
