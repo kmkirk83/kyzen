@@ -20,4 +20,19 @@ describe("visibility-summary", () => {
     expect(compositeScore(100, 100, 0)).toBe(80);
     expect(compositeScore(0, 0, 100)).toBe(20);
   });
+
+  it("returns ranked improvements with links", () => {
+    const summary = buildVisibilitySummary("2026-10-22T00:00:00.000Z");
+    expect(summary.improvements.length).toBeGreaterThan(0);
+    expect(summary.improvements[0]).toEqual(
+      expect.objectContaining({
+        id: expect.any(String),
+        title: expect.any(String),
+        why: expect.any(String),
+        href: expect.any(String),
+        cta: expect.any(String),
+        priority: expect.stringMatching(/high|medium|low/),
+      }),
+    );
+  });
 });
