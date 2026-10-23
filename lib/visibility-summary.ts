@@ -3,14 +3,22 @@ export type SurfaceKey = "answer_engines" | "assistants" | "search_overviews";
 export type SurfaceScore = {
   key: SurfaceKey;
   label: string;
-  /** 0-100 presence in AI answers */
   coverage: number;
-  /** 0-100 how often cited with quality */
   trust: number;
-  /** 0-100 tone favorability */
   sentiment: number;
-  /** derived composite for this surface */
   score: number;
+};
+
+export type Improvement = {
+  id: string;
+  title: string;
+  why: string;
+  impact: "coverage" | "trust" | "sentiment" | "overall";
+  priority: "high" | "medium" | "low";
+  surface?: SurfaceKey;
+  /** In-product or docs path a buyer/operator can open */
+  href: string;
+  cta: string;
 };
 
 export type VisibilitySummary = {
@@ -19,9 +27,7 @@ export type VisibilitySummary = {
   organization: string;
   brand: string;
   generatedAt: string;
-  /** Single headline score 0-100 */
   overallScore: number;
-  /** Three simple pillars that explain the headline */
   pillars: {
     coverage: number;
     trust: number;
@@ -29,6 +35,7 @@ export type VisibilitySummary = {
   };
   surfaces: SurfaceScore[];
   trend: "up" | "flat" | "down";
+  improvements: Improvement[];
   notes: string[];
 };
 
@@ -46,6 +53,79 @@ const SAMPLE: Array<Omit<SurfaceScore, "score">> = [
   { key: "assistants", label: "Assistants", coverage: 36, trust: 64, sentiment: 58 },
   { key: "search_overviews", label: "Search overviews", coverage: 51, trust: 78, sentiment: 82 },
 ];
+
+/** Score-driven improvement catalog for the sample evaluation path */
+export function buildImprovements(
+  pillars: VisibilitySummary["pillars"],
+  surfaces: SurfaceScore[],
+): Improvement[] {
+  const items: Improvement[] = [];
+
+  const weakest = [...surfaces].sort((a, b) => a.score - b.score)[0];
+
+  if (pillars.coverage < 55) {
+    items.push({
+      id: "expand-source-presence",
+      title: "Expand authoritative source presence",
+      why: "Coverage is the largest drag on the headline score. AI systems answer from sources they already trust; more high-quality pages in your category increases how often you appear.",
+      impact: "coverage",
+      priority: "high",
+      href: "/start#evaluation",
+      cta: "Review evaluation path",
+    });
+  }
+
+  if (pillars.trust < 70) {
+    items.push({
+      id: "strengthen-citations",
+      title: "Strengthen citation-ready claims",
+      why: "Trust rises when answers can point to clear, structured facts (specs, comparisons, definitions). Tightening claim structure makes mentions more attributable.",
+      impact: "trust",
+      priority: pillars.trust < 60 ? "high" : "medium",
+      href: "/api/visibility/summary",
+      cta: "Inspect score contract",
+    });
+  }
+
+  if (pillars.sentiment < 65) {
+    items.push({
+      id: "improve-narrative",
+      title: "Improve brand narrative consistency",
+      why: "Sentiment reflects how you are framed when mentioned. Aligning public messaging and proof points reduces mixed or weak portrayals in AI answers.",
+      impact: "sentiment",
+      priority: "medium",
+      href: "/start",
+      cta: "Open buyer quick start",
+    });
+  }
+
+  if (weakest && weakest.score < 60) {
+    items.push({
+      id: `surface-${weakest.key}`,
+      title: `Prioritize ${weakest.label.toLowerCase()}`,
+      why: `${weakest.label} is your weakest surface (score ${weakest.score}). Closing the gap here usually lifts the overall score faster than small gains on already-strong surfaces.`,
+      impact: "overall",
+      priority: "high",
+      surface: weakest.key,
+      href: `/dashboard#surface-${weakest.key}`,
+      cta: "Jump to surface",
+    });
+  }
+
+  // Always offer a structural / product next step for evaluators
+  items.push({
+    id: "wire-live-tenants",
+    title: "Connect live tenant visibility data",
+    why: "This demo uses sample scores so you can evaluate the product surface immediately. Wiring Prisma tenant queries replaces sample data with production measurements.",
+    impact: "overall",
+    priority: "medium",
+    href: "https://github.com/kmkirk83/kyzen/blob/main/SALES.md",
+    cta: "Read sale / scope notes",
+  });
+
+  const order = { high: 0, medium: 1, low: 2 };
+  return items.sort((a, b) => order[a.priority] - order[b.priority]);
+}
 
 export function buildVisibilitySummary(generatedAt = new Date().toISOString()): VisibilitySummary {
   const surfaces: SurfaceScore[] = SAMPLE.map((s) => ({
@@ -71,6 +151,7 @@ export function buildVisibilitySummary(generatedAt = new Date().toISOString()): 
     pillars,
     surfaces,
     trend: "up",
+    improvements: buildImprovements(pillars, surfaces),
     notes: [
       "Scores use a simple weighted model: coverage 40%, trust 40%, sentiment 20%.",
       "Sample data — no database or API keys required to evaluate the product surface.",
