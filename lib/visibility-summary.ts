@@ -1,4 +1,5 @@
 export type SurfaceKey = "answer_engines" | "assistants" | "search_overviews";
+export type DataMode = "sample" | "seeded";
 
 export type SurfaceScore = {
   key: SurfaceKey;
@@ -16,23 +17,18 @@ export type Improvement = {
   impact: "coverage" | "trust" | "sentiment" | "overall";
   priority: "high" | "medium" | "low";
   surface?: SurfaceKey;
-  /** In-product or docs path a buyer/operator can open */
   href: string;
   cta: string;
 };
 
 export type VisibilitySummary = {
-  source: "sample";
-  featureFlag: "VISIBILITY_SAMPLE_DATA";
+  source: DataMode;
+  featureFlag: "VISIBILITY_SAMPLE_DATA" | "VISIBILITY_SEEDED_DATA";
   organization: string;
   brand: string;
   generatedAt: string;
   overallScore: number;
-  pillars: {
-    coverage: number;
-    trust: number;
-    sentiment: number;
-  };
+  pillars: { coverage: number; trust: number; sentiment: number };
   surfaces: SurfaceScore[];
   trend: "up" | "flat" | "down";
   improvements: Improvement[];
@@ -43,24 +39,28 @@ function clamp(n: number) {
   return Math.max(0, Math.min(100, Math.round(n)));
 }
 
-/** Weighted composite: coverage 40%, trust 40%, sentiment 20% */
 export function compositeScore(coverage: number, trust: number, sentiment: number) {
   return clamp(coverage * 0.4 + trust * 0.4 + sentiment * 0.2);
 }
 
-const SAMPLE: Array<Omit<SurfaceScore, "score">> = [
+const SAMPLE_RAW: Array<Omit<SurfaceScore, "score">> = [
   { key: "answer_engines", label: "Answer engines", coverage: 42, trust: 71, sentiment: 78 },
   { key: "assistants", label: "Assistants", coverage: 36, trust: 64, sentiment: 58 },
   { key: "search_overviews", label: "Search overviews", coverage: 51, trust: 78, sentiment: 82 },
 ];
 
-/** Score-driven improvement catalog for the sample evaluation path */
+/** Seeded catalog — stands in for Prisma tenant rows without requiring DATABASE_URL */
+const SEEDED_RAW: Array<Omit<SurfaceScore, "score">> = [
+  { key: "answer_engines", label: "Answer engines", coverage: 58, trust: 76, sentiment: 81 },
+  { key: "assistants", label: "Assistants", coverage: 49, trust: 70, sentiment: 66 },
+  { key: "search_overviews", label: "Search overviews", coverage: 63, trust: 82, sentiment: 85 },
+];
+
 export function buildImprovements(
   pillars: VisibilitySummary["pillars"],
   surfaces: SurfaceScore[],
 ): Improvement[] {
   const items: Improvement[] = [];
-
   const weakest = [...surfaces].sort((a, b) => a.score - b.score)[0];
 
   if (pillars.coverage < 55) {
@@ -74,31 +74,28 @@ export function buildImprovements(
       cta: "Review evaluation path",
     });
   }
-
   if (pillars.trust < 70) {
     items.push({
       id: "strengthen-citations",
       title: "Strengthen citation-ready claims",
-      why: "Trust rises when answers can point to clear, structured facts (specs, comparisons, definitions). Tightening claim structure makes mentions more attributable.",
+      why: "Trust rises when answers can point to clear, structured facts. Tightening claim structure makes mentions more attributable.",
       impact: "trust",
       priority: pillars.trust < 60 ? "high" : "medium",
       href: "/api/visibility/summary",
       cta: "Inspect score contract",
     });
   }
-
   if (pillars.sentiment < 65) {
     items.push({
       id: "improve-narrative",
       title: "Improve brand narrative consistency",
-      why: "Sentiment reflects how you are framed when mentioned. Aligning public messaging and proof points reduces mixed or weak portrayals in AI answers.",
+      why: "Sentiment reflects how you are framed when mentioned. Aligning public messaging reduces mixed portrayals in AI answers.",
       impact: "sentiment",
       priority: "medium",
       href: "/start",
       cta: "Open buyer quick start",
     });
   }
-
   if (weakest && weakest.score < 60) {
     items.push({
       id: `surface-${weakest.key}`,
@@ -111,51 +108,58 @@ export function buildImprovements(
       cta: "Jump to surface",
     });
   }
-
-  // Always offer a structural / product next step for evaluators
   items.push({
     id: "wire-live-tenants",
     title: "Connect live tenant visibility data",
-    why: "This demo uses sample scores so you can evaluate the product surface immediately. Wiring Prisma tenant queries replaces sample data with production measurements.",
+    why: "Seeded mode simulates tenant rows in-process. Wiring Prisma + DATABASE_URL replaces catalogs with production measurements.",
     impact: "overall",
     priority: "medium",
     href: "https://github.com/kmkirk83/kyzen/blob/main/SALES.md",
     cta: "Read sale / scope notes",
   });
 
-  const order = { high: 0, medium: 1, low: 2 };
+  const order = { high: 0, medium: 1, low: 2 } as const;
   return items.sort((a, b) => order[a.priority] - order[b.priority]);
 }
 
-export function buildVisibilitySummary(generatedAt = new Date().toISOString()): VisibilitySummary {
-  const surfaces: SurfaceScore[] = SAMPLE.map((s) => ({
+export function buildVisibilitySummary(
+  generatedAt = new Date().toISOString(),
+  mode: DataMode = "sample",
+): VisibilitySummary {
+  const raw = mode === "seeded" ? SEEDED_RAW : SAMPLE_RAW;
+  const surfaces: SurfaceScore[] = raw.map((s) => ({
     ...s,
     score: compositeScore(s.coverage, s.trust, s.sentiment),
   }));
-
   const pillars = {
     coverage: clamp(surfaces.reduce((t, s) => t + s.coverage, 0) / surfaces.length),
     trust: clamp(surfaces.reduce((t, s) => t + s.trust, 0) / surfaces.length),
     sentiment: clamp(surfaces.reduce((t, s) => t + s.sentiment, 0) / surfaces.length),
   };
-
   const overallScore = compositeScore(pillars.coverage, pillars.trust, pillars.sentiment);
 
   return {
-    source: "sample",
-    featureFlag: "VISIBILITY_SAMPLE_DATA",
-    organization: "Sample workspace",
-    brand: "kyzen",
+    source: mode,
+    featureFlag: mode === "seeded" ? "VISIBILITY_SEEDED_DATA" : "VISIBILITY_SAMPLE_DATA",
+    organization: mode === "seeded" ? "Acme Analytics (seed)" : "Sample workspace",
+    brand: mode === "seeded" ? "Acme" : "kyzen",
     generatedAt,
     overallScore,
     pillars,
     surfaces,
-    trend: "up",
+    trend: mode === "seeded" ? "up" : "up",
     improvements: buildImprovements(pillars, surfaces),
-    notes: [
-      "Scores use a simple weighted model: coverage 40%, trust 40%, sentiment 20%.",
-      "Sample data — no database or API keys required to evaluate the product surface.",
-      "Live tenant queries are the main remaining integration step.",
-    ],
+    notes:
+      mode === "seeded"
+        ? [
+            "Seeded mode uses in-repo catalog rows that mirror a tenant snapshot (no DATABASE_URL required).",
+            "Scores use coverage 40% + trust 40% + sentiment 20%.",
+            "Swap this catalog for Prisma reads when DATABASE_URL is configured.",
+          ]
+        : [
+            "Scores use coverage 40% + trust 40% + sentiment 20%.",
+            "Sample data — no database or API keys required.",
+            "Toggle Seeded on the dashboard to preview a higher-fidelity tenant snapshot.",
+          ],
   };
 }
