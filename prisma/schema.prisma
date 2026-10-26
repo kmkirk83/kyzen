@@ -53,6 +53,8 @@ model Organization {
   subscriptions     Subscription[]
   auditLogs         AuditLog[]
   evaluationRuns    EvaluationRun[]
+  evaluationPrompts EvaluationPrompt[]
+  onboardingCompletedAt DateTime?
 }
 
 model Membership {
@@ -176,4 +178,18 @@ model EvaluationRun {
 
   @@index([organizationId, measuredAt])
   @@index([organizationId, brandName])
+}
+
+
+model EvaluationPrompt {
+  id             String       @id @default(cuid())
+  organizationId String
+  brandId        String?
+  text           String
+  surface        String       @default("answer_engines")
+  active         Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, active])
 }
