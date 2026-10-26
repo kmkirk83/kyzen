@@ -30,7 +30,7 @@ export type VisibilitySummary = {
   overallScore: number;
   pillars: { coverage: number; trust: number; sentiment: number };
   surfaces: SurfaceScore[];
-  trend: "up" | "flat" | "down";
+  trend: "up" | "flat" | "down" | "unavailable";
   improvements: Improvement[];
   notes: string[];
 };
@@ -147,7 +147,7 @@ export function buildVisibilitySummary(
     overallScore,
     pillars,
     surfaces,
-    trend: mode === "seeded" ? "up" : "up",
+    trend: "unavailable",
     improvements: buildImprovements(pillars, surfaces),
     notes:
       mode === "seeded"
