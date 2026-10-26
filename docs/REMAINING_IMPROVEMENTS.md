@@ -303,3 +303,24 @@ Week 4
 ## 9. What not to rebuild
 
 Keep: scoring weights, recommendation engine, dashboard visual system, Telegram fail-closed controls, explicit fixture catalogs for public demo, SALES/Escrow packaging.
+
+
+---
+
+## Implementation status (2026-10-26)
+
+| Item | Status |
+|------|--------|
+| Prisma client + conditional persist | Done |
+| Session auth + login/onboarding | Done |
+| Wizard GUI | Done |
+| Batch measure | Done |
+| Evidence panel on dashboard | Done |
+| API keys issue/verify + Bearer auth | Done |
+| Trends helper | Done |
+| CSP header | Done |
+| Buyer runbook | Done |
+| Live LLM measurement provider | Partial (mock default; copilot has live providers) |
+| Auth.js OAuth/magic-link | Not required (HMAC sessions); upgrade optional |
+| Job queue | Not done (batch capped at 10 inline) |
+| Marketplace listing assets | Human step |
