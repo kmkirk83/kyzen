@@ -99,6 +99,12 @@ export default function DashboardPage() {
   const [mode, setMode] = useState<DataMode>("sample");
   const [done, setDone] = useState<Record<string, boolean>>({});
 
+  const [evidence, setEvidence] = useState<
+    Array<{ id: string; prompt: string; brandName: string; scores: { overall: number }; response: { measuredAt: string; citations: Array<{ title: string }> } }>
+  >([]);
+  const [liveAgg, setLiveAgg] = useState<{ overall: number; count: number; persisted?: boolean } | null>(null);
+
+
   useEffect(() => {
     try {
       const m = localStorage.getItem(MODE_KEY) as DataMode | null;
@@ -109,6 +115,17 @@ export default function DashboardPage() {
       /* ignore */
     }
   }, []);
+
+  
+  useEffect(() => {
+    fetch("/api/visibility/measure")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data.runs)) setEvidence(data.runs.slice(0, 8));
+        if (data.aggregate) setLiveAgg(data.aggregate);
+      })
+      .catch(() => {});
+  }, [mode]);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -317,6 +334,43 @@ export default function DashboardPage() {
               );
             })}
           </ul>
+        </section>
+
+        
+        <section className="improveSection plane" aria-labelledby="evidence-heading">
+          <div className="improveHead">
+            <h2 id="evidence-heading">Evidence</h2>
+            <p className="improveLede">
+              {liveAgg
+                ? `Live aggregate ${liveAgg.overall} from ${liveAgg.count} run(s)${liveAgg.persisted ? " (persisted)" : " (session memory)"}.`
+                : "No measurements yet. Complete the onboarding wizard or POST /api/visibility/measure."}
+            </p>
+          </div>
+          {evidence.length > 0 ? (
+            <ul className="improveList">
+              {evidence.map((run) => (
+                <li key={run.id} className="improveCard">
+                  <div className="improveTop">
+                    <span className="impactTag">{run.brandName}</span>
+                    <span className={`surfaceScore tone-${scoreTone(run.scores.overall)}`}>
+                      {run.scores.overall}
+                    </span>
+                  </div>
+                  <h3>{run.prompt}</h3>
+                  <p className="improveWhy">
+                    {run.response.measuredAt?.slice(0, 19).replace("T", " ")}
+                    {run.response.citations?.length
+                      ? ` · ${run.response.citations.length} citation(s)`
+                      : ""}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="improveWhy">
+              <a href="/onboarding">Start the setup wizard</a> to generate evidence-backed scores.
+            </p>
+          )}
         </section>
 
         <section className="howSection">
