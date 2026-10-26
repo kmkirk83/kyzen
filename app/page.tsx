@@ -28,7 +28,8 @@ export default function Home() {
             answers and search — with a live demo, score model, and recommendation checklist.
           </p>
           <div className="heroActions">
-            <Link href="/dashboard" className="btnPrimary">Open dashboard</Link>
+            <Link href="/onboarding" className="btnPrimary">Start setup wizard</Link>
+            <Link href="/dashboard" className="btnGhost">Open dashboard</Link>
             <Link href="/start" className="btnGhost">Buyer quick start</Link>
           </div>
         </section>
