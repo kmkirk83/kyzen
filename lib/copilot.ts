@@ -3,7 +3,7 @@ import type { AppEnv } from "@/lib/env";
 const DEFAULT_OPENAI_MODEL = "gpt-4o-mini";
 const DEFAULT_ANTHROPIC_MODEL = "claude-3-5-haiku-latest";
 const DEFAULT_SYSTEM_PROMPT =
-  "You are Clarion Copilot. Help the user complete software and product tasks. Be concise, action-oriented, and explicit about any missing context or risks.";
+  "You are kyzen Copilot. Help the user complete software and product tasks. Be concise, action-oriented, and explicit about any missing context or risks.";
 
 type OpenAiChatCompletionResponse = {
   choices?: Array<{
@@ -66,7 +66,10 @@ async function createOpenAiReply({
   prompt: string;
   message: string;
 }): Promise<CopilotReply> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    signal: controller.signal,
     method: "POST",
     headers: {
       Authorization: "Bearer " + apiKey,
