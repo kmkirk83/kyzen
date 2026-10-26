@@ -145,6 +145,25 @@ function toRun(row: {
   };
 }
 
+
+async function ensureOrganization(organizationId: string, brandName?: string) {
+  const { prisma } = await import("@/lib/prisma");
+  const slug = organizationId
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 48) || "demo";
+  await prisma.organization.upsert({
+    where: { id: organizationId },
+    create: {
+      id: organizationId,
+      name: brandName ? `${brandName} workspace` : `Workspace ${organizationId}`,
+      slug: `${slug}-${organizationId.slice(-6) || "x"}`,
+    },
+    update: {},
+  });
+}
+
 export async function runMeasurement(input: {
   organizationId: string;
   brandId: string;
@@ -158,6 +177,7 @@ export async function runMeasurement(input: {
 
   if (hasDatabase()) {
     try {
+      await ensureOrganization(input.organizationId, input.brandName);
       const { prisma } = await import("@/lib/prisma");
       const row = await prisma.evaluationRun.create({
         data: {
