@@ -7,11 +7,8 @@ export async function POST(request: NextRequest) {
   const tenant = await requireAuthTenant(request);
   if (tenant instanceof NextResponse) return tenant;
 
-  if (tenant.role === "VIEWER" || tenant.role === "ANALYST") {
-    // allow ADMIN/OWNER only for key issuance
-    if (tenant.role !== "OWNER" && tenant.role !== "ADMIN") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+  if (tenant.role !== "OWNER" && tenant.role !== "ADMIN") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   let body: { label?: string; scopes?: string[] } = {};
@@ -28,15 +25,18 @@ export async function POST(request: NextRequest) {
     scopes: body.scopes,
   });
 
-  return NextResponse.json({
-    apiKey: result.raw,
-    record: {
-      id: result.record.id,
-      label: result.record.label,
-      prefix: result.record.prefix,
-      scopes: result.record.scopes,
-      createdAt: result.record.createdAt,
+  return NextResponse.json(
+    {
+      apiKey: result.raw,
+      record: {
+        id: result.record.id,
+        label: result.record.label,
+        prefix: result.record.prefix,
+        scopes: result.record.scopes,
+        createdAt: result.record.createdAt,
+      },
+      warning: "Store this key now. It will not be shown again.",
     },
-    warning: "Store this key now. It will not be shown again.",
-  }, { status: 201 });
+    { status: 201 },
+  );
 }
