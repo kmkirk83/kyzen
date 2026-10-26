@@ -52,6 +52,7 @@ model Organization {
   billingCustomer   BillingCustomer?
   subscriptions     Subscription[]
   auditLogs         AuditLog[]
+  evaluationRuns    EvaluationRun[]
 }
 
 model Membership {
@@ -114,6 +115,9 @@ model ApiKey {
   hashedKey       String
   createdAt       DateTime          @default(now())
   lastUsedAt      DateTime?
+  expiresAt       DateTime?
+  revokedAt       DateTime?
+  scopes          String?
   organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -146,4 +150,30 @@ model AuditLog {
   createdAt        DateTime       @default(now())
   organization     Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   actor            User           @relation(fields: [actorUserId], references: [id], onDelete: Cascade)
+}
+
+
+// Evidence-backed measurement trail (audit package 4/5)
+model EvaluationRun {
+  id               String   @id @default(cuid())
+  organizationId   String
+  brandId          String?
+  brandName        String
+  prompt           String
+  surface          String
+  provider         String
+  model            String
+  rawResponse      String
+  citationsJson    String
+  coverage         Float
+  trust            Float
+  sentiment        Float
+  overall          Float
+  scoringVersion   String
+  measuredAt       DateTime
+  createdAt        DateTime @default(now())
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, measuredAt])
+  @@index([organizationId, brandName])
 }
