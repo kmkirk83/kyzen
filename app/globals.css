@@ -621,3 +621,22 @@ a:hover { text-decoration: underline; }
 .checklist { margin: 0.75rem 0 0; padding-left: 1.15rem; color: var(--muted); line-height: 1.65; }
 .checklist.ordered { padding-left: 1.25rem; }
 .marketing .surfaceCard h2 { margin: 0 0 0.5rem; font-size: 1.05rem; }
+
+.wizardProgress { display: flex; gap: 0.4rem; margin-top: 1.25rem; }
+.wizardProgress span {
+  width: 1.75rem; height: 1.75rem; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700; color: var(--muted);
+  border: 1px solid var(--border); background: rgba(0,0,0,0.25);
+}
+.wizardProgress span.on {
+  color: var(--accent); border-color: rgba(56,189,248,0.45); background: var(--accent-soft);
+}
+.field { display: flex; flex-direction: column; gap: 0.35rem; margin: 0.85rem 0; color: var(--muted); font-size: 0.85rem; }
+.field input, .wizardTextarea {
+  border-radius: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.35);
+  color: var(--foreground); padding: 0.7rem 0.85rem; font: inherit;
+}
+.wizardTextarea { width: 100%; resize: vertical; }
+.wizardError { color: #fecaca; margin: 0; }
+.loginForm { max-width: 28rem; }
