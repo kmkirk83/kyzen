@@ -16,11 +16,11 @@ permissions:
 jobs:
   validate:
     name: Lint, Typecheck, Test, Build
-    runs-on: [self-hosted, linux, x64]  # use self-hosted when registered; otherwise change back to ubuntu-latest after billing unlock
-    timeout-minutes: 15
+    # Prefer ubuntu-latest so checks always run; self-hosted remains optional via workflow_dispatch override later
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
-      # Dummy DATABASE_URL so Prisma validate/generate does not fail in CI
-      DATABASE_URL: postgresql://ci:ci@localhost:5432/clarion?schema=public
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/kyzen?schema=public
       NEXT_TELEMETRY_DISABLED: "1"
 
     steps:
@@ -38,11 +38,9 @@ jobs:
 
       - name: Generate Prisma client
         run: npx prisma generate
-        continue-on-error: true
 
       - name: Validate Prisma schema
         run: npm run prisma:validate
-        continue-on-error: true
 
       - name: Lint
         run: npm run lint
