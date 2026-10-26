@@ -1,43 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { denyIfCannotWrite, resolveRequestTenant } from "@/lib/auth-tenant";
 import {
   aggregateOrgScores,
   getMeasurement,
   listMeasurements,
   runMeasurement,
 } from "@/lib/measurement";
-import { canWrite, resolveTenantContext } from "@/lib/tenancy";
 
 export async function GET(request: NextRequest) {
-  const org = request.nextUrl.searchParams.get("organizationId");
+  const tenant = await resolveRequestTenant(request);
   const id = request.nextUrl.searchParams.get("id");
-  const ctx = resolveTenantContext({
-    organizationId: org || request.headers.get("x-organization-id"),
-    role: request.headers.get("x-role"),
-  });
 
   if (id) {
-    const run = getMeasurement(id, ctx.organizationId);
+    const run = await getMeasurement(id, tenant.organizationId);
     if (!run) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(run);
   }
 
+  const runs = await listMeasurements(tenant.organizationId);
+  const aggregate = await aggregateOrgScores(tenant.organizationId);
   return NextResponse.json({
-    organizationId: ctx.organizationId,
-    aggregate: aggregateOrgScores(ctx.organizationId),
-    runs: listMeasurements(ctx.organizationId),
+    organizationId: tenant.organizationId,
+    authenticated: tenant.authenticated,
+    aggregate,
+    runs,
   });
 }
 
 export async function POST(request: NextRequest) {
-  const ctx = resolveTenantContext({
-    organizationId: request.headers.get("x-organization-id"),
-    role: request.headers.get("x-role"),
-  });
-
-  if (!canWrite(ctx)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const tenant = await resolveRequestTenant(request);
+  const denied = denyIfCannotWrite(tenant);
+  if (denied) return denied;
 
   let body: {
     brandName?: string;
@@ -53,8 +47,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const organizationId = body.organizationId || ctx.organizationId;
-  if (organizationId !== ctx.organizationId) {
+  if (body.organizationId && body.organizationId !== tenant.organizationId) {
     return NextResponse.json({ error: "Tenant isolation violation" }, { status: 403 });
   }
 
@@ -64,8 +57,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "brandName and prompt are required" }, { status: 400 });
   }
 
-  const run = runMeasurement({
-    organizationId,
+  const run = await runMeasurement({
+    organizationId: tenant.organizationId,
     brandId: body.brandId?.trim() || `brand_${brandName.toLowerCase().replace(/\s+/g, "_")}`,
     brandName,
     prompt,
