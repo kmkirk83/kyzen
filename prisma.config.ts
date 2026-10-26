@@ -1,7 +1,3 @@
-import { defineConfig } from "prisma/config";
-
-export default defineConfig({
-  datasource: {
-    url: process.env.DATABASE_URL!,
-  },
-});
+// Prisma 6 uses url = env("DATABASE_URL") in schema.prisma.
+// This stub avoids Prisma 7 defineConfig type errors during next build.
+export {};
