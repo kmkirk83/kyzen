@@ -8,6 +8,7 @@ import {
   isTelegramChatAllowed,
   parseAllowedTelegramChatIds,
 } from "@/lib/telegram";
+import { checkTelegramQuota, isDuplicateTelegramUpdate } from "@/lib/telegram-limits";
 
 export async function POST(request: NextRequest) {
   const envResult = readAppEnv();
@@ -41,11 +42,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Malformed Telegram update." }, { status: 400 });
   }
 
+  if (isDuplicateTelegramUpdate(update.update_id)) {
+    return NextResponse.json({ ok: true, duplicate: true });
+  }
+
   const message = getTelegramTextMessage(update);
   if (message) {
     const allowed = parseAllowedTelegramChatIds(env.TELEGRAM_ALLOWED_CHAT_IDS);
     if (!isTelegramChatAllowed(message.chatId, allowed)) {
       return NextResponse.json({ error: "Chat not allowed." }, { status: 403 });
+    }
+
+    const quota = checkTelegramQuota(message.chatId);
+    if (!quota.ok) {
+      return NextResponse.json({ error: quota.reason }, { status: 429 });
     }
   }
 
