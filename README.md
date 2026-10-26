@@ -72,3 +72,14 @@ See `SALES.md` for the full sale package: asking range, Escrow transfer, what is
 ## License
 
 See [LICENSE](LICENSE).
+
+## For buyers / marketplace
+
+- **Demo:** https://kyzen-demo-kmkirk83s-projects.vercel.app/dashboard
+- **Setup wizard:** https://kyzen-demo-kmkirk83s-projects.vercel.app/onboarding
+- **Listing copy:** [docs/LISTING.md](docs/LISTING.md)
+- **Outreach templates:** [docs/OUTREACH_BATCH.md](docs/OUTREACH_BATCH.md)
+- **Day-1 runbook:** [docs/BUYER_RUNBOOK.md](docs/BUYER_RUNBOOK.md)
+- **Price band:** $8k–$14k (see SALES.md)
+
+*Loom walkthrough:* add URL here after recording (script in docs/DEMO.md).
