@@ -16,6 +16,7 @@ $8,000 – $14,000 (preferred close ≥ $10,000)
 - Full GitHub repository transfer
 - All documentation and commercialization scaffolding
 - Working sample-data dashboard + `/start` buyer quick-start
+- Post-purchase GUI onboarding wizard (`/onboarding`) — environment check + first organization without CLI
 - Docker, CI, release automation
 - 7 days of reasonable technical questions after transfer
 
@@ -33,6 +34,7 @@ $8,000 – $14,000 (preferred close ≥ $10,000)
 1. Visit `/start` and `/dashboard` on the demo deployment (or run locally).
 2. Review Prisma schema and commercialization docs under `docs/`.
 3. Confirm sample-data path needs no provider keys.
+4. After transfer, open `/onboarding` to run the customer setup wizard.
 
 ## Contact
 Seller: repository owner on GitHub (`kmkirk83`).

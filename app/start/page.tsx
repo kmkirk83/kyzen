@@ -10,6 +10,7 @@ export default function StartPage() {
         </div>
         <nav className="topLinks">
           <Link href="/">Home</Link>
+          <Link href="/onboarding">Onboarding</Link>
           <Link href="/dashboard" className="topCta">Dashboard</Link>
         </nav>
       </header>
@@ -23,7 +24,8 @@ export default function StartPage() {
             on the dashboard, then tick recommendations to see checklist state.
           </p>
           <div className="heroActions">
-            <Link href="/dashboard" className="btnPrimary">Open dashboard</Link>
+            <Link href="/onboarding" className="btnPrimary">Post-purchase setup</Link>
+            <Link href="/dashboard" className="btnGhost">Open dashboard</Link>
             <a href="/api/visibility/summary" className="btnGhost">API summary</a>
           </div>
         </section>
