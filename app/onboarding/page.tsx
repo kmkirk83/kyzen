@@ -30,6 +30,7 @@ const STEPS = [
   { id: "welcome", label: "Welcome" },
   { id: "environment", label: "Environment" },
   { id: "organization", label: "Organization" },
+  { id: "measure", label: "Measure" },
   { id: "complete", label: "Ready" },
 ] as const;
 
@@ -57,6 +58,11 @@ export default function OnboardingPage() {
   const [orgMessage, setOrgMessage] = useState<string | null>(null);
   const [orgPersisted, setOrgPersisted] = useState(false);
   const [submittingOrg, setSubmittingOrg] = useState(false);
+  const [brandName, setBrandName] = useState("");
+  const [prompts, setPrompts] = useState("What is this brand known for?\nBest alternatives to this product");
+  const [measuring, setMeasuring] = useState(false);
+  const [measureMessage, setMeasureMessage] = useState<string | null>(null);
+  const [measureCount, setMeasureCount] = useState(0);
 
   useEffect(() => {
     try {
@@ -66,10 +72,14 @@ export default function OnboardingPage() {
         step?: number;
         org?: OrgForm;
         orgPersisted?: boolean;
+        brandName?: string;
+        prompts?: string;
       };
       if (parsed.org) setOrg(parsed.org);
       if (typeof parsed.step === "number") setStep(Math.min(parsed.step, STEPS.length - 1));
       if (parsed.orgPersisted) setOrgPersisted(true);
+      if (parsed.brandName) setBrandName(parsed.brandName);
+      if (parsed.prompts) setPrompts(parsed.prompts);
     } catch {
       // ignore corrupt draft
     }
@@ -79,12 +89,12 @@ export default function OnboardingPage() {
     try {
       window.localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ step, org, orgPersisted }),
+        JSON.stringify({ step, org, orgPersisted, brandName, prompts }),
       );
     } catch {
       // storage may be unavailable
     }
-  }, [step, org, orgPersisted]);
+  }, [step, org, orgPersisted, brandName, prompts]);
 
   const loadReadiness = useCallback(async () => {
     setLoadingReadiness(true);
@@ -155,6 +165,33 @@ export default function OnboardingPage() {
     }
   }
 
+  async function runBatchMeasure() {
+    const name = brandName.trim();
+    const promptList = prompts.split("\n").map((p) => p.trim()).filter(Boolean);
+    if (!name || promptList.length === 0) {
+      setMeasureMessage("Brand name and at least one prompt required.");
+      return;
+    }
+    setMeasuring(true);
+    setMeasureMessage(null);
+    try {
+      const res = await fetch("/api/visibility/measure/batch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brandName: name, prompts: promptList }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `Measure failed (${res.status})`);
+      setMeasureCount(data.count || promptList.length);
+      setMeasureMessage(`Created ${data.count || promptList.length} measurement run(s). Open dashboard Evidence to view.`);
+      setStep(4);
+    } catch (err) {
+      setMeasureMessage(err instanceof Error ? err.message : "Unable to run measurements");
+    } finally {
+      setMeasuring(false);
+    }
+  }
+
   return (
     <>
       <section className="plane plane-raised heroPlane">
@@ -184,14 +221,13 @@ export default function OnboardingPage() {
         <section className="plane improveSection">
           <h2>Welcome</h2>
           <p className="improveWhy">
-            After repository transfer, this wizard walks you through environment readiness and
-            the first organization. You can continue in sample mode without a database, then
-            connect Postgres when you are ready for live tenants.
+            After repository transfer, this wizard walks you through environment readiness,
+            the first organization, brand prompts, and a batch measurement that appears in dashboard Evidence.
           </p>
           <ul className="checklist">
             <li>Environment checks use the existing readiness API.</li>
             <li>Organization details can be drafted without CLI.</li>
-            <li>You can open the dashboard at any time with sample data.</li>
+            <li>Batch measure writes runs visible on /dashboard Evidence.</li>
           </ul>
           <div className="heroActions">
             <button type="button" className="btnPrimary" onClick={() => setStep(1)}>
@@ -340,11 +376,61 @@ export default function OnboardingPage() {
 
       {step === 3 && (
         <section className="plane improveSection">
+          <h2>3. Brand and batch measure</h2>
+          <p className="improveWhy">
+            Enter a brand and one or more prompts (one per line). This calls POST /api/visibility/measure/batch
+            (mock provider by default) and persists runs for the current tenant. They appear under Evidence on the dashboard.
+          </p>
+          <div className="onboardForm">
+            <label>
+              Brand name
+              <input
+                type="text"
+                value={brandName}
+                onChange={(e) => setBrandName(e.target.value)}
+                placeholder="Acme Corp"
+              />
+            </label>
+            <label>
+              Prompts (one per line)
+              <textarea
+                value={prompts}
+                onChange={(e) => setPrompts(e.target.value)}
+                rows={4}
+                placeholder="What is Acme known for?\nTop competitors of Acme"
+              />
+            </label>
+          </div>
+          {measureMessage && (
+            <p className={measureCount > 0 ? "tone-good" : "tone-mid"} role="status">
+              {measureMessage}
+            </p>
+          )}
+          <div className="heroActions">
+            <button type="button" className="btnGhost" onClick={() => setStep(2)}>
+              Back
+            </button>
+            <button
+              type="button"
+              className="btnPrimary"
+              disabled={measuring || !brandName.trim()}
+              onClick={() => void runBatchMeasure()}
+            >
+              {measuring ? "Measuring\u2026" : "Run batch measure"}
+            </button>
+          </div>
+        </section>
+      )}
+
+      {step === 4 && (
+        <section className="plane improveSection">
           <h2>Setup ready</h2>
           <p className="improveWhy">
-            {orgPersisted
-              ? "Your organization is stored. Open the dashboard to continue brand setup and visibility scoring."
-              : "Draft organization is saved in this browser. Connect PostgreSQL and re-run this step when you are ready for live multi-tenant data."}
+            {measureCount > 0
+              ? `Batch complete: ${measureCount} run(s) created. Open the dashboard Evidence panel to review.`
+              : orgPersisted
+                ? "Your organization is stored. Open the dashboard to continue."
+                : "Draft organization is saved in this browser. Connect PostgreSQL and re-run when ready for live data."}
           </p>
           <ul className="checklist">
             <li>
@@ -356,13 +442,14 @@ export default function OnboardingPage() {
             <li>
               Mode: <strong>{orgPersisted ? "Persisted" : "Draft / sample"}</strong>
             </li>
+            {measureCount > 0 && <li>Measurements: <strong>{measureCount}</strong></li>}
           </ul>
           <div className="heroActions">
             <Link href="/dashboard" className="btnPrimary">
-              Open dashboard
+              Open dashboard Evidence
             </Link>
-            <button type="button" className="btnGhost" onClick={() => setStep(2)}>
-              Edit organization
+            <button type="button" className="btnGhost" onClick={() => setStep(3)}>
+              Edit brand / re-measure
             </button>
             <Link href="/start" className="btnGhost">
               Evaluation guide
