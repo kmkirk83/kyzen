@@ -751,3 +751,78 @@ button.btnGhost {
   border-radius: 50%;
   background: var(--accent);
 }
+
+/* UX: sample vs live mode banner */
+.modeBanner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--surface-3, #182338);
+  background: var(--surface-2, #121b2e);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+.modeBanner strong {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.modeBanner-sample {
+  border-color: rgba(148, 163, 184, 0.35);
+}
+.modeBanner-sample strong { color: #94a3b8; }
+.modeBanner-live {
+  border-color: rgba(52, 211, 153, 0.45);
+  background: rgba(6, 78, 59, 0.25);
+}
+.modeBanner-live strong { color: #34d399; }
+.modeBanner a {
+  color: #7dd3fc;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* UX: evidence loading skeleton */
+.evidenceSkeleton {
+  display: grid;
+  gap: 0.75rem;
+}
+.skeletonCard {
+  height: 5.5rem;
+  border-radius: 12px;
+  background: linear-gradient(
+    90deg,
+    var(--surface-2, #121b2e) 0%,
+    var(--surface-3, #182338) 50%,
+    var(--surface-2, #121b2e) 100%
+  );
+  background-size: 200% 100%;
+  animation: kyzenShimmer 1.2s ease-in-out infinite;
+}
+@keyframes kyzenShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.emptyEvidence {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (max-width: 720px) {
+  .modeBanner {
+    padding: 0.75rem 0.9rem;
+  }
+  .dashTopActions .modeToggle button {
+    min-height: 2.5rem;
+    padding: 0.45rem 0.85rem;
+  }
+  .hamburger {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+}

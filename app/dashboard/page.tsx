@@ -103,6 +103,7 @@ export default function DashboardPage() {
     Array<{ id: string; prompt: string; brandName: string; scores: { overall: number }; response: { measuredAt: string; citations: Array<{ title: string }> } }>
   >([]);
   const [liveAgg, setLiveAgg] = useState<{ overall: number; count: number; persisted?: boolean } | null>(null);
+  const [evidenceLoading, setEvidenceLoading] = useState(true);
 
 
   useEffect(() => {
@@ -118,13 +119,15 @@ export default function DashboardPage() {
 
   
   useEffect(() => {
+    setEvidenceLoading(true);
     fetch("/api/visibility/measure")
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data.runs)) setEvidence(data.runs.slice(0, 8));
         if (data.aggregate) setLiveAgg(data.aggregate);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setEvidenceLoading(false));
   }, [mode]);
 
   useEffect(() => {
@@ -228,6 +231,29 @@ export default function DashboardPage() {
       </aside>
 
       <main className="dashMain">
+        <div
+          className={`modeBanner ${liveAgg && liveAgg.count > 0 ? "modeBanner-live" : "modeBanner-sample"}`}
+          role="status"
+        >
+          {liveAgg && liveAgg.count > 0 ? (
+            <>
+              <strong>Live measurements</strong>
+              <span>
+                Evidence and aggregates come from {liveAgg.count} run(s)
+                {liveAgg.persisted ? " persisted in Postgres" : " in session memory"}. Sample/Seeded cards remain
+                fixture catalogs for buyer evaluation.
+              </span>
+            </>
+          ) : (
+            <>
+              <strong>Sample fixtures</strong>
+              <span>
+                Score cards below use in-repo sample or seeded catalogs. Complete{" "}
+                <a href="/onboarding">onboarding</a> or POST /api/visibility/measure to populate live Evidence.
+              </span>
+            </>
+          )}
+        </div>
         <section className="plane plane-raised scoreHero">
           <div className="scoreHeroLeft">
             <p className="chip">
@@ -346,7 +372,13 @@ export default function DashboardPage() {
                 : "No measurements yet. Complete the onboarding wizard or POST /api/visibility/measure."}
             </p>
           </div>
-          {evidence.length > 0 ? (
+          {evidenceLoading ? (
+            <div className="evidenceSkeleton" aria-busy="true" aria-label="Loading evidence">
+              <div className="skeletonCard" />
+              <div className="skeletonCard" />
+              <div className="skeletonCard" />
+            </div>
+          ) : evidence.length > 0 ? (
             <ul className="improveList">
               {evidence.map((run) => (
                 <li key={run.id} className="improveCard">
@@ -367,9 +399,19 @@ export default function DashboardPage() {
               ))}
             </ul>
           ) : (
-            <p className="improveWhy">
-              <a href="/onboarding">Start the setup wizard</a> to generate evidence-backed scores.
-            </p>
+            <div className="emptyEvidence">
+              <p className="improveWhy">
+                No live measurement runs yet. Fixture scores above are for evaluation only.
+              </p>
+              <div className="heroActions">
+                <a className="btnPrimary" href="/onboarding">
+                  Start setup wizard
+                </a>
+                <a className="btnGhost" href="/start">
+                  Buyer quick start
+                </a>
+              </div>
+            </div>
           )}
         </section>
 
