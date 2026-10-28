@@ -85,7 +85,7 @@ export default function StartPage() {
 
         <section className="plane improveSection">
           <h2>Local run (optional)</h2>
-          <pre className="codeBlock">{["cp .env.example .env", "npm ci", "npm run dev"].join("
+          <pre className="codeBlock">{["cp .env.example .env", "npm ci", "npm run dev"].join("\n")}</pre>
 ")}</pre>
           <p className="improveWhy">
             Then open <code>/dashboard</code>. Attach <code>DATABASE_URL</code> for live tenants.
