@@ -100,9 +100,9 @@ export default function DashboardPage() {
   const [done, setDone] = useState<Record<string, boolean>>({});
 
   const [evidence, setEvidence] = useState<
-    Array<{ id: string; prompt: string; brandName: string; scores: { overall: number }; response: { measuredAt: string; citations: Array<{ title: string }> } }>
+    Array<{ id: string; prompt: string; brandName: string; scores: { overall: number }; response: { measuredAt: string; citations: Array<{ title: string }>; provider?: string } }>
   >([]);
-  const [liveAgg, setLiveAgg] = useState<{ overall: number; count: number; persisted?: boolean } | null>(null);
+  const [liveAgg, setLiveAgg] = useState<{ overall: number; count: number; persisted?: boolean; providers?: string[] } | null>(null);
   const [evidenceLoading, setEvidenceLoading] = useState(true);
 
 
@@ -164,6 +164,8 @@ export default function DashboardPage() {
   }
 
   const completedCount = summary.improvements.filter((i) => done[i.id]).length;
+
+  const providerLabel = liveAgg?.providers?.includes("mock") ? " (mock provider)" : "";
 
   return (
     <div className="dashRoot">
@@ -237,7 +239,7 @@ export default function DashboardPage() {
         >
           {liveAgg && liveAgg.count > 0 ? (
             <>
-              <strong>Live measurements</strong>
+              <strong>Live measurements{providerLabel}</strong>
               <span>
                 Evidence and aggregates come from {liveAgg.count} run(s)
                 {liveAgg.persisted ? " persisted in Postgres" : " in session memory"}. Sample/Seeded cards remain
@@ -365,10 +367,10 @@ export default function DashboardPage() {
         
         <section className="improveSection plane" aria-labelledby="evidence-heading">
           <div className="improveHead">
-            <h2 id="evidence-heading">Evidence</h2>
+            <h2 id="evidence-heading">Evidence{providerLabel}</h2>
             <p className="improveLede">
               {liveAgg
-                ? `Live aggregate ${liveAgg.overall} from ${liveAgg.count} run(s)${liveAgg.persisted ? " (persisted)" : " (session memory)"}.`
+                ? `Live aggregate ${liveAgg.overall} from ${liveAgg.count} run(s)${liveAgg.persisted ? " (persisted)" : " (session memory)"}${providerLabel}.`
                 : "No measurements yet. Complete the onboarding wizard or POST /api/visibility/measure."}
             </p>
           </div>
@@ -394,6 +396,7 @@ export default function DashboardPage() {
                     {run.response.citations?.length
                       ? ` · ${run.response.citations.length} citation(s)`
                       : ""}
+                    {run.response.provider ? ` · ${run.response.provider}` : ""}
                   </p>
                 </li>
               ))}
