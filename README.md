@@ -31,7 +31,7 @@ Public demo includes persisted measurement runs (mock provider). No API keys req
 3. Review `prisma/schema.prisma` for the multi-tenant commercial model.
 4. Hit `GET /api/visibility/summary`, `GET /api/visibility/measure`, and `GET /api/health`.
 
-**Scope boundary:** Live tenant measurement persistence is wired (Neon on the public demo). Optional LLM providers fall back to deterministic mock. Sample/seeded catalogs remain available without a database for quick evaluation.
+**Scope boundary:** Live tenant measurement persistence is wired (Neon on the public demo). Optional LLM providers fall back to deterministic mock. Sample/seeded catalogs remain available without a database for quick evaluation. Tenancy isolation by `x-organization-id` is verified on the measure API (see docs/BUYER_RUNBOOK.md).
 
 ## Local development
 
