@@ -8,6 +8,24 @@ import {
   runMeasurement,
 } from "@/lib/measurement";
 
+// Simple in-memory rate limit (per-instance; suitable for demo/sale evaluation).
+// Limits POST to 10 per minute per organizationId.
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 10;
+
+function checkRateLimit(key: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(key);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= RATE_LIMIT_MAX) return false;
+  entry.count += 1;
+  return true;
+}
+
 export async function GET(request: NextRequest) {
   const tenant = await resolveRequestTenant(request);
   const id = request.nextUrl.searchParams.get("id");
@@ -32,6 +50,14 @@ export async function POST(request: NextRequest) {
   const tenant = await resolveRequestTenant(request);
   const denied = denyIfCannotWrite(tenant);
   if (denied) return denied;
+
+  const rateKey = `measure:${tenant.organizationId}`;
+  if (!checkRateLimit(rateKey)) {
+    return NextResponse.json(
+      { error: "Rate limit exceeded. Try again in a minute." },
+      { status: 429 },
+    );
+  }
 
   let body: {
     brandName?: string;
