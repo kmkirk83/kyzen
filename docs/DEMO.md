@@ -29,11 +29,11 @@ Alternate project URL may appear in older docs; prefer the primary above.
 - Onboarding Measure step
 
 **Automated stills captured this run (headless chromium, 1440x900):**
-- `/start` (kyzen-start.png)
-- `/dashboard` (kyzen-dashboard.png)
-- `/onboarding` (kyzen-onboarding.png)
+- `/start` (start.png)
+- `/dashboard` (dashboard.png)
+- `/onboarding` (onboarding.png)
 
-(HUMAN: attach these or higher-res captures to listing; video still required.)
+Screenshots available in agent artifacts for this verification run. HUMAN: attach these or higher-res captures to listing; video still required.
 
 ## 60-second script (HUMAN: record 60s)
 
@@ -46,13 +46,13 @@ Alternate project URL may appear in older docs; prefer the primary above.
 
 Record at 1080p; link the video URL in README when uploaded.
 
-**Note:** Automated MP4 walkthrough generation is blocked in the current agent environment (ffmpeg static build lacks drawtext filter). Screenshots produced this run; human recording still required for video asset.
+**Note:** Automated MP4 walkthrough generation is blocked in the current agent environment (ffmpeg static build lacks drawtext filter for title cards). Screenshots produced this run; human recording still required for video asset.
 
-## Latest verification (2026-10-29 22:11 UTC)
+## Latest verification (2026-10-29 23:13 UTC)
 
 - GET `/api/visibility/measure` with `x-organization-id: org_acme_demo` returns 36 runs, aggregate count 36, `persisted: true`, providers: ["mock"].
 - POST with custom `x-organization-id` creates a run (`persisted: true`) that is immediately returned by subsequent GET for that org.
-- Dashboard Evidence panel displays the live runs, aggregate, and explicit "(mock provider)" label.
+- Dashboard Evidence panel displays the live runs and aggregate (persisted).
 - Health endpoint returns `{"status":"ok"}`.
 - Tenancy isolation confirmed via distinct organization IDs.
 - Basic in-memory rate limit present on measure route (serverless-friendly; resets per instance).
