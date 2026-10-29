@@ -28,6 +28,13 @@ Alternate project URL may appear in older docs; prefer the primary above.
 - Sample vs Seeded toggle
 - Onboarding Measure step
 
+**Automated stills captured this run (headless chromium, 1440x900):**
+- `/start`
+- `/dashboard` (Evidence panel visible in scroll)
+- `/onboarding`
+
+(HUMAN: attach these or higher-res captures to listing; video still required.)
+
 ## 60-second script (HUMAN: record 60s)
 
 1. (0:00–0:08) Open `/start` — “Buyer super demo: live Evidence, no login.”
@@ -38,6 +45,8 @@ Alternate project URL may appear in older docs; prefer the primary above.
 6. (0:55–1:00) Point to repo + SALES.md — price band, Escrow, transfer.
 
 Record at 1080p; link the video URL in README when uploaded.
+
+**Note:** Automated MP4 walkthrough generation is blocked in the current agent environment (ffmpeg static build lacks drawtext filter). Screenshots produced; human recording still required for video asset.
 
 ## Seeded live demo note
 
