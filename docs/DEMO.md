@@ -48,13 +48,14 @@ Record at 1080p; link the video URL in README when uploaded.
 
 **Note:** Automated MP4 walkthrough generation is blocked in the current agent environment (ffmpeg static build lacks drawtext filter). Screenshots produced this run; human recording still required for video asset.
 
-## Latest verification (2026-10-29)
+## Latest verification (2026-10-29 22:11 UTC)
 
-- GET `/api/visibility/measure` returns 33+ runs with `persisted: true` for `org_acme_demo`.
-- POST with custom `x-organization-id` creates a run that is immediately returned by subsequent GET for that org (`persisted: true`).
-- Dashboard Evidence panel displays the live runs and aggregate.
+- GET `/api/visibility/measure` with `x-organization-id: org_acme_demo` returns 36 runs, aggregate count 36, `persisted: true`, providers: ["mock"].
+- POST with custom `x-organization-id` creates a run (`persisted: true`) that is immediately returned by subsequent GET for that org.
+- Dashboard Evidence panel displays the live runs, aggregate, and explicit "(mock provider)" label.
 - Health endpoint returns `{"status":"ok"}`.
 - Tenancy isolation confirmed via distinct organization IDs.
+- Basic in-memory rate limit present on measure route (serverless-friendly; resets per instance).
 
 ## Seeded live demo note
 
