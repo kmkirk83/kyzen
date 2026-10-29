@@ -11,11 +11,11 @@ Alternate project URL may appear in older docs; prefer the primary above.
 1. **Start** — https://kyzen-demo.vercel.app/start  
    60-second path: Evidence → Sample/Seeded → optional onboarding measure.
 2. **Dashboard Evidence** — https://kyzen-demo.vercel.app/dashboard  
-   Scroll to **Evidence**. Live aggregate and runs are loaded from `GET /api/visibility/measure` (Neon when `DATABASE_URL` is set).
+   Scroll to **Evidence**. Live aggregate and runs are loaded from `GET /api/visibility/measure` (Neon when `DATABASE_URL` is set). Verified: POST with `x-organization-id` persists and returns on subsequent GET (`persisted: true`).
 3. **Toggle Sample ↔ Seeded** in the dashboard header.
 4. **Mark one recommendation done** (browser-local checklist).
 5. **Onboarding batch measure** — https://kyzen-demo.vercel.app/onboarding  
-   Welcome → Environment → Organization → **Measure** (brand + prompts) → Ready → Open dashboard Evidence.
+   Welcome → Environment → Organization → **Measure** (brand + prompts) → Ready → Open dashboard Evidence. Batch endpoint also verified live.
 6. **API** — https://kyzen-demo.vercel.app/api/visibility/summary  
    and https://kyzen-demo.vercel.app/api/health
 
@@ -29,9 +29,9 @@ Alternate project URL may appear in older docs; prefer the primary above.
 - Onboarding Measure step
 
 **Automated stills captured this run (headless chromium, 1440x900):**
-- `/start`
-- `/dashboard` (Evidence panel visible in scroll)
-- `/onboarding`
+- `/start` (kyzen-start.png)
+- `/dashboard` (kyzen-dashboard.png)
+- `/onboarding` (kyzen-onboarding.png)
 
 (HUMAN: attach these or higher-res captures to listing; video still required.)
 
@@ -46,8 +46,8 @@ Alternate project URL may appear in older docs; prefer the primary above.
 
 Record at 1080p; link the video URL in README when uploaded.
 
-**Note:** Automated MP4 walkthrough generation is blocked in the current agent environment (ffmpeg static build lacks drawtext filter). Screenshots produced; human recording still required for video asset.
+**Note:** Automated MP4 walkthrough generation is blocked in the current agent environment (ffmpeg static build lacks drawtext filter). Screenshots produced this run; human recording still required for video asset.
 
 ## Seeded live demo note
 
-Public demo org `org_acme_demo` has persisted evaluation runs (including Kyzen-brand prompts). Dashboard Evidence should show them without authentication when the deployment has `DATABASE_URL`.
+Public demo org `org_acme_demo` has persisted evaluation runs (including Kyzen-brand prompts). Dashboard Evidence should show them without authentication when the deployment has `DATABASE_URL`. Current dashboard reports 30+ live mock-provider runs persisted in Postgres.
