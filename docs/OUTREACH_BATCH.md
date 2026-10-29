@@ -1,7 +1,7 @@
 # Outreach batch 1 — copy/paste
 
 Subject lines (rotate):
-1. AI visibility SaaS foundation — kyzen ($8–14k)
+1. AI visibility SaaS foundation — kyzen ($4–9k)
 2. Selling Next.js multi-tenant visibility product
 3. Ready-to-run brand visibility SaaS (demo linked)
 
@@ -11,12 +11,12 @@ Subject lines (rotate):
 
 Hi {{name}},
 
-I\'m transferring kyzen, a multi-tenant AI brand-visibility SaaS (Next.js + Prisma).
+I'm transferring kyzen, a multi-tenant AI brand-visibility SaaS (Next.js + Prisma). Revenue $0; pure digital asset.
 
-Demo: https://kyzen-demo-kmkirk83s-projects.vercel.app/dashboard  
-Wizard: https://kyzen-demo-kmkirk83s-projects.vercel.app/onboarding  
+Demo: https://kyzen-demo.vercel.app/dashboard  
+Wizard: https://kyzen-demo.vercel.app/onboarding  
 Repo: https://github.com/kmkirk83/kyzen  
-Ask: $8k–$14k via Escrow.com
+Ask: $4k–$9k via Escrow.com
 
 Includes scoring engine, onboarding wizard, session auth, API keys, and sale docs.
 
@@ -38,8 +38,8 @@ Building and selling a few AI/SaaS assets from my portfolio. kyzen is the visibi
 - Wizard so a buyer can pipe in their own brand and see runs
 - Telegram integration and CI already hardened for transfer
 
-Live dashboard: https://kyzen-demo-kmkirk83s-projects.vercel.app/dashboard  
-Price band $8–14k, Escrow, short support window after transfer.
+Live dashboard: https://kyzen-demo.vercel.app/dashboard  
+Price band $4–$9k, Escrow, short support window after transfer. Revenue $0.
 
 Happy to walk through a 15-minute demo if useful.
 
@@ -50,14 +50,14 @@ Happy to walk through a 15-minute demo if useful.
 ## LinkedIn / X short
 
 Selling kyzen — multi-tenant AI visibility SaaS (Next.js).  
-Demo: https://kyzen-demo-kmkirk83s-projects.vercel.app/dashboard  
-$8–14k Escrow. DM if you acquire small B2B SaaS.
+Demo: https://kyzen-demo.vercel.app/dashboard  
+$4–$9k Escrow. DM if you acquire small B2B SaaS.
 
 ---
 
 ## Indie Hackers post skeleton
 
-**Title:** Selling kyzen — AI brand visibility SaaS foundation ($8–14k)
+**Title:** Selling kyzen — AI brand visibility SaaS foundation ($4–9k)
 
 Body: use Long description from docs/LISTING.md + demo links.
 
