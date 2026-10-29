@@ -51,6 +51,26 @@ curl -X POST https://YOUR_HOST/api/visibility/measure \
 - Measurements via `/api/visibility/measure` → memory or Prisma `EvaluationRun` (Neon on demo).
 - Dashboard Evidence panel reads `/api/visibility/measure`.
 
-## 5. Support window
+## 5. Tenancy isolation (verified)
+
+Public demo measure API scopes runs by `x-organization-id` header (or session org when authenticated).
+
+Verification (live demo):
+```bash
+# Create run under custom org
+curl -X POST https://kyzen-demo.vercel.app/api/visibility/measure \
+  -H "Content-Type: application/json" \
+  -H "x-organization-id: org_test_isolation" \
+  -d '{"brandName":"IsolationTest","prompt":"Test tenancy"}'
+
+# GET returns only that org's runs
+curl -H "x-organization-id: org_test_isolation" https://kyzen-demo.vercel.app/api/visibility/measure
+# vs default demo org
+curl -H "x-organization-id: org_acme_demo" https://kyzen-demo.vercel.app/api/visibility/measure
+```
+
+Different organization IDs return isolated aggregates and runs. Dashboard Evidence on the public demo uses the default demo org.
+
+## 6. Support window
 
 See `SALES.md` for Escrow terms and post-sale support.
