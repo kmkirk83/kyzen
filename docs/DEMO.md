@@ -48,6 +48,14 @@ Record at 1080p; link the video URL in README when uploaded.
 
 **Note:** Automated MP4 walkthrough generation is blocked in the current agent environment (ffmpeg static build lacks drawtext filter). Screenshots produced this run; human recording still required for video asset.
 
+## Latest verification (2026-10-29)
+
+- GET `/api/visibility/measure` returns 33+ runs with `persisted: true` for `org_acme_demo`.
+- POST with custom `x-organization-id` creates a run that is immediately returned by subsequent GET for that org (`persisted: true`).
+- Dashboard Evidence panel displays the live runs and aggregate.
+- Health endpoint returns `{"status":"ok"}`.
+- Tenancy isolation confirmed via distinct organization IDs.
+
 ## Seeded live demo note
 
 Public demo org `org_acme_demo` has persisted evaluation runs (including Kyzen-brand prompts). Dashboard Evidence should show them without authentication when the deployment has `DATABASE_URL`. Current dashboard reports 30+ live mock-provider runs persisted in Postgres.
