@@ -46,13 +46,13 @@ Screenshots available in agent artifacts for this verification run. HUMAN: attac
 
 Record at 1080p; link the video URL in README when uploaded.
 
-**Note:** Simple caption-free MP4 walkthrough (65s, start + dashboard + onboarding screenshots) generated this run and available in agent artifacts as `kyzen-buyer-walkthrough.mp4`. Full captioned version with title cards remains blocked by ffmpeg drawtext limitations. HUMAN: record voiceover or upload the asset; video still required for marketplace.
+**Note:** Simple caption-free MP4 walkthrough generation blocked by missing ffmpeg drawtext filter in this environment. HUMAN: record voiceover or upload the asset; video still required for marketplace.
 
-## Latest verification (2026-10-30 02:10 UTC)
+## Latest verification (2026-10-30 03:15 UTC)
 
-- GET `/api/visibility/measure` (default org) returns 36+ runs, aggregate count 36+, `persisted: true`, providers: ["mock"].
-- Dashboard Evidence panel displays live aggregate and multiple persisted runs (reported ~32 on page load; consistent with Neon-backed mock provider). Mock provider is labeled in the Evidence banner and heading.
-- Batch measure `POST /api/visibility/measure/batch` with brandName + prompts array succeeds and persists; subsequent GET returns the new runs at the top of the list (E2E onboarding path verified).
+- GET `/api/visibility/measure` (default org) returns 40 runs, aggregate count 40, `persisted: true`, providers: ["mock"].
+- Dashboard Evidence panel displays live aggregate and multiple persisted runs. Mock provider is labeled in the Evidence banner and heading.
+- Batch measure `POST /api/visibility/measure/batch` with brandName + prompts array succeeds and persists; subsequent GET returns the new runs at the top of the list (E2E onboarding path verified with ExecutorTest2026).
 - Health endpoint returns `{"status":"ok","service":"kyzen","version":"0.3.0"}`.
 - Production deployment on Vercel is READY (latest main commits).
 - PWA assets present: `/manifest.webmanifest`, `/sw.js`, icons; service worker registration in layout.
