@@ -33,7 +33,7 @@ Alternate project URL may appear in older docs; prefer the primary above.
 - `/dashboard` (dashboard.png)
 - `/onboarding` (onboarding.png)
 
-Screenshots available in agent artifacts for this verification run. HUMAN: attach these or higher-res captures to listing; video still required.
+Screenshots available in agent artifacts for this verification run. HUMAN: attach these or higher-res captures to listing.
 
 ## 60-second script (HUMAN: record 60s)
 
@@ -46,12 +46,12 @@ Screenshots available in agent artifacts for this verification run. HUMAN: attac
 
 Record at 1080p; link the video URL in README when uploaded.
 
-**Note:** Automated MP4 walkthrough generation is blocked in the current agent environment (ffmpeg static build lacks drawtext filter for title cards). Screenshots produced this run; human recording still required for video asset.
+**Note:** Simple caption-free MP4 walkthrough (65s, start + dashboard + onboarding screenshots) generated this run and available in agent artifacts as `kyzen-buyer-walkthrough.mp4`. Full captioned version with title cards remains blocked by ffmpeg drawtext limitations. HUMAN: record voiceover or upload the asset; video still required for marketplace.
 
-## Latest verification (2026-10-30 01:15 UTC)
+## Latest verification (2026-10-30 02:10 UTC)
 
-- GET `/api/visibility/measure` (default org) returns 38 runs, aggregate count 38, `persisted: true`, providers: ["mock"].
-- Dashboard Evidence panel displays live aggregate and multiple persisted runs (reported ~32–38 on page load; consistent with Neon-backed mock provider). Mock provider is labeled in the Evidence banner and heading.
+- GET `/api/visibility/measure` (default org) returns 36+ runs, aggregate count 36+, `persisted: true`, providers: ["mock"].
+- Dashboard Evidence panel displays live aggregate and multiple persisted runs (reported ~32 on page load; consistent with Neon-backed mock provider). Mock provider is labeled in the Evidence banner and heading.
 - Batch measure `POST /api/visibility/measure/batch` with brandName + prompts array succeeds and persists; subsequent GET returns the new runs at the top of the list (E2E onboarding path verified).
 - Health endpoint returns `{"status":"ok","service":"kyzen","version":"0.3.0"}`.
 - Production deployment on Vercel is READY (latest main commits).
