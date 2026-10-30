@@ -48,14 +48,15 @@ Record at 1080p; link the video URL in README when uploaded.
 
 **Note:** Automated MP4 walkthrough generation is blocked in the current agent environment (ffmpeg static build lacks drawtext filter for title cards). Screenshots produced this run; human recording still required for video asset.
 
-## Latest verification (2026-10-29 23:13 UTC)
+## Latest verification (2026-10-30 00:15 UTC)
 
-- GET `/api/visibility/measure` with `x-organization-id: org_acme_demo` returns 36 runs, aggregate count 36, `persisted: true`, providers: ["mock"].
-- POST with custom `x-organization-id` creates a run (`persisted: true`) that is immediately returned by subsequent GET for that org.
-- Dashboard Evidence panel displays the live runs and aggregate (persisted).
-- Health endpoint returns `{"status":"ok"}`.
-- Tenancy isolation confirmed via distinct organization IDs.
-- Basic in-memory rate limit present on measure route (serverless-friendly; resets per instance).
+- GET `/api/visibility/measure` (default org) returns 36 runs, aggregate count 36, `persisted: true`, providers: ["mock"].
+- Dashboard Evidence panel displays live aggregate and multiple persisted runs (reported 32 on page load; consistent with Neon-backed mock provider).
+- Health endpoint returns `{"status":"ok","service":"kyzen","version":"0.3.0"}`.
+- Production deployment on Vercel is READY (latest main commits).
+- PWA assets present: `/manifest.webmanifest`, `/sw.js`, icons; service worker registration in layout.
+- Dependabot major-version freeze configured in `.github/dependabot.yml`.
+- **CI blocker:** GitHub Actions runs fail with "account is locked due to a billing issue" (ubuntu-latest). Workflows themselves are valid; billing must be resolved on the owner account for green CI. Vercel production deploys continue independently.
 
 ## Seeded live demo note
 
