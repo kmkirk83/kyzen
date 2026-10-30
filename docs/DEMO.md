@@ -48,10 +48,11 @@ Record at 1080p; link the video URL in README when uploaded.
 
 **Note:** Automated MP4 walkthrough generation is blocked in the current agent environment (ffmpeg static build lacks drawtext filter for title cards). Screenshots produced this run; human recording still required for video asset.
 
-## Latest verification (2026-10-30 00:15 UTC)
+## Latest verification (2026-10-30 01:15 UTC)
 
-- GET `/api/visibility/measure` (default org) returns 36 runs, aggregate count 36, `persisted: true`, providers: ["mock"].
-- Dashboard Evidence panel displays live aggregate and multiple persisted runs (reported 32 on page load; consistent with Neon-backed mock provider).
+- GET `/api/visibility/measure` (default org) returns 38 runs, aggregate count 38, `persisted: true`, providers: ["mock"].
+- Dashboard Evidence panel displays live aggregate and multiple persisted runs (reported ~32–38 on page load; consistent with Neon-backed mock provider). Mock provider is labeled in the Evidence banner and heading.
+- Batch measure `POST /api/visibility/measure/batch` with brandName + prompts array succeeds and persists; subsequent GET returns the new runs at the top of the list (E2E onboarding path verified).
 - Health endpoint returns `{"status":"ok","service":"kyzen","version":"0.3.0"}`.
 - Production deployment on Vercel is READY (latest main commits).
 - PWA assets present: `/manifest.webmanifest`, `/sw.js`, icons; service worker registration in layout.
