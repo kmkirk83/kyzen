@@ -6,7 +6,7 @@ export default function StartPage() {
       <header className="dashTop">
         <div className="dashBrand">
           <span className="dashLogo">kyzen</span>
-          <span className="dashMeta">Buyer super demo</span>
+          <span className="dashMeta">Product tour</span>
         </div>
         <nav className="topLinks">
           <Link href="/">Home</Link>
@@ -19,78 +19,51 @@ export default function StartPage() {
 
       <main className="dashMain marketing" id="evaluation">
         <section className="plane plane-raised heroPlane">
-          <span className="eyebrow">Live product demo · no login required</span>
-          <h1 className="marketingTitle">60-second buyer path</h1>
+          <span className="eyebrow">Live demo · no login required</span>
+          <h1 className="marketingTitle">60-second product tour</h1>
           <p className="lede">
-            kyzen measures how visible a brand is across AI answer surfaces. This public demo
-            already has persisted Evidence runs. Walk the path below, then open the dashboard.
+            See how kyzen scores brand visibility across AI answer surfaces and surfaces the
+            next actions worth taking. This demo already includes persisted Evidence runs.
           </p>
           <div className="heroActions">
             <Link href="/dashboard" className="btnPrimary">
-              Open live Evidence
+              Open dashboard
             </Link>
             <Link href="/onboarding" className="btnGhost">
-              Run onboarding + batch measure
+              Run a batch measure
             </Link>
             <a href="/api/visibility/measure" className="btnGhost">
-              GET measure API
+              Measure API
             </a>
           </div>
         </section>
 
         <section className="plane improveSection">
-          <h2>Click path (exact)</h2>
+          <h2>Suggested path</h2>
           <ol className="checklist ordered">
             <li>
-              Open <Link href="/dashboard">/dashboard</Link> — sample scores, surface cards, and the
-              <strong> Evidence</strong> panel (live runs from Neon).
+              Open <Link href="/dashboard">/dashboard</Link> — headline score, surface cards, and the{" "}
+              <strong>Evidence</strong> panel with live runs.
             </li>
             <li>
-              Toggle <strong>Sample ↔ Seeded</strong> in the header to see fixture vs higher-fidelity snapshot.
+              Toggle <strong>Sample ↔ Seeded</strong> in the header to compare fixture catalogs.
             </li>
+            <li>Mark one recommendation done — progress is stored in this browser.</li>
             <li>
-              Mark one recommendation done — checklist state persists in the browser.
-            </li>
-            <li>
-              Optional: open <Link href="/onboarding">/onboarding</Link>, create an org, enter a brand +
-              prompts, click <strong>Run batch measure</strong>, then return to Evidence.
-            </li>
-            <li>
-              Hit <code>GET /api/health</code> and <code>GET /api/visibility/summary</code> for the public contract.
+              Optional: open <Link href="/onboarding">/onboarding</Link>, enter a brand and prompts,
+              run a batch measure, then return to Evidence.
             </li>
           </ol>
         </section>
 
         <section className="plane improveSection">
-          <h2>What is already live on this demo</h2>
+          <h2>Included in this demo</h2>
           <ul className="checklist">
-            <li>Multi-tenant measure API with Neon persistence (<code>persisted: true</code>)</li>
-            <li>Batch measure endpoint used by the onboarding wizard</li>
-            <li>Dashboard Evidence panel reading the same org runs</li>
-            <li>Honest mock provider when no LLM keys are set</li>
-            <li>Prisma schema, auth, API keys, Telegram fail-closed path in source</li>
+            <li>Multi-tenant measure API with Neon persistence</li>
+            <li>Batch measure used by the onboarding wizard</li>
+            <li>Dashboard Evidence panel bound to the same org runs</li>
+            <li>Honest mock provider when LLM keys are not configured</li>
           </ul>
-        </section>
-
-        <section className="plane improveSection">
-          <h2>What a buyer gets after transfer</h2>
-          <ul className="checklist">
-            <li>Full Next.js 16 + TypeScript application</li>
-            <li>Prisma multi-tenant foundation + optional seed</li>
-            <li>Dashboard, score engine, recommendations checklist, Evidence</li>
-            <li>Docker, CI, release automation, commercialization docs</li>
-            <li>1-day handoff path documented in SALES.md / BUYER_RUNBOOK.md</li>
-          </ul>
-        </section>
-
-        <section className="plane improveSection">
-          <h2>Local run (optional)</h2>
-          <pre className="codeBlock">
-            {["cp .env.example .env", "npm ci", "npm run dev"].join("\n")}
-          </pre>
-          <p className="improveWhy">
-            Then open <code>/dashboard</code>. Attach <code>DATABASE_URL</code> for live tenants.
-          </p>
         </section>
       </main>
     </div>

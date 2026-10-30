@@ -70,8 +70,8 @@ export function buildImprovements(
       why: "Coverage is the largest drag on the headline score. AI systems answer from sources they already trust; more high-quality pages in your category increases how often you appear.",
       impact: "coverage",
       priority: "high",
-      href: "/start#evaluation",
-      cta: "Review evaluation path",
+      href: "/dashboard#evidence-heading",
+      cta: "Review Evidence",
     });
   }
   if (pillars.trust < 70) {
@@ -81,8 +81,8 @@ export function buildImprovements(
       why: "Trust rises when answers can point to clear, structured facts. Tightening claim structure makes mentions more attributable.",
       impact: "trust",
       priority: pillars.trust < 60 ? "high" : "medium",
-      href: "/api/visibility/summary",
-      cta: "Inspect score contract",
+      href: "/dashboard",
+      cta: "Inspect scores",
     });
   }
   if (pillars.sentiment < 65) {
@@ -92,8 +92,8 @@ export function buildImprovements(
       why: "Sentiment reflects how you are framed when mentioned. Aligning public messaging reduces mixed portrayals in AI answers.",
       impact: "sentiment",
       priority: "medium",
-      href: "/start",
-      cta: "Open buyer quick start",
+      href: "/onboarding",
+      cta: "Run a new measure",
     });
   }
   if (weakest && weakest.score < 60) {
@@ -108,15 +108,18 @@ export function buildImprovements(
       cta: "Jump to surface",
     });
   }
-  items.push({
-    id: "wire-live-tenants",
-    title: "Connect live tenant visibility data",
-    why: "Seeded mode simulates tenant rows in-process. Wiring Prisma + DATABASE_URL replaces catalogs with production measurements.",
-    impact: "overall",
-    priority: "medium",
-    href: "https://github.com/kmkirk83/kyzen/blob/main/SALES.md",
-    cta: "Read sale / scope notes",
-  });
+  // Product-facing fallback when scores are already strong
+  if (items.length === 0) {
+    items.push({
+      id: "maintain-coverage",
+      title: "Maintain source freshness",
+      why: "Scores are healthy. Keep authoritative pages current so coverage and trust do not drift as models refresh their indexes.",
+      impact: "overall",
+      priority: "low",
+      href: "/onboarding",
+      cta: "Schedule a measure",
+    });
+  }
 
   const order = { high: 0, medium: 1, low: 2 } as const;
   return items.sort((a, b) => order[a.priority] - order[b.priority]);
@@ -152,14 +155,14 @@ export function buildVisibilitySummary(
     notes:
       mode === "seeded"
         ? [
-            "Seeded mode uses in-repo catalog rows that mirror a tenant snapshot (no DATABASE_URL required).",
+            "Seeded mode uses a higher-fidelity in-repo tenant snapshot for evaluation.",
             "Scores use coverage 40% + trust 40% + sentiment 20%.",
-            "Swap this catalog for Prisma reads when DATABASE_URL is configured.",
+            "Live Evidence runs (when present) come from the measure API independently of this catalog.",
           ]
         : [
             "Scores use coverage 40% + trust 40% + sentiment 20%.",
-            "Sample data — no database or API keys required.",
-            "Toggle Seeded on the dashboard to preview a higher-fidelity tenant snapshot.",
+            "Sample catalog is available without a database or API keys.",
+            "Toggle Seeded for a higher-fidelity snapshot, or run a batch measure for live Evidence.",
           ],
   };
 }

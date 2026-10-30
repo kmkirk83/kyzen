@@ -2,29 +2,22 @@ export const platformPillars = [
   {
     title: "Visibility intelligence",
     description:
-      "Track share-of-answer, citation quality, sentiment, and recommendation accuracy across AI assistants.",
+      "Track share-of-answer, citation quality, and sentiment across AI answer engines, assistants, and search overviews.",
   },
   {
-    title: "Commercial operations",
+    title: "Actionable recommendations",
     description:
-      "Support subscription billing, organization workspaces, API access, and audit logs from the outset.",
+      "Turn scores into prioritized improvements so teams know what to publish, structure, and reinforce next.",
   },
   {
-    title: "Developer distribution",
+    title: "Multi-tenant workspaces",
     description:
-      "Prepare for hosted SaaS, future SDK/CLI packaging, release automation, and self-hosted enterprise delivery.",
+      "Organizations, brands, measurement runs, and Evidence stay scoped per workspace from day one.",
   },
 ];
 
-export const launchTracks = [
-  "Hosted multi-tenant SaaS with secure operational defaults.",
-  "Typed public API foundation for partners and automation.",
-  "Container-ready runtime for enterprise and marketplace distribution.",
-];
-
-export const commercializationChecklist = [
-  "Defined runtime, lockfile, lint, typecheck, test, and production build commands.",
-  "Release automation, changelog management, security policy, and dependency governance.",
-  "Prisma domain model for tenants, billing, API keys, reports, and audit trails.",
-  "Docker-compatible Next.js standalone output and deployment runbook.",
+export const productHighlights = [
+  "Live measurement pipeline with honest mock fallback when no LLM keys are set.",
+  "Dashboard with headline score, surface breakdown, and Evidence panel.",
+  "Guided onboarding wizard for organization, brand, and first batch measure.",
 ];

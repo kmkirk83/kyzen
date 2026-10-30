@@ -1,9 +1,5 @@
 import Link from "next/link";
-import {
-  commercializationChecklist,
-  launchTracks,
-  platformPillars,
-} from "@/lib/site-content";
+import { platformPillars, productHighlights } from "@/lib/site-content";
 
 export default function Home() {
   return (
@@ -15,22 +11,30 @@ export default function Home() {
         </div>
         <nav className="topLinks">
           <Link href="/start">Quick start</Link>
-          <Link href="/dashboard" className="topCta">Dashboard</Link>
+          <Link href="/dashboard" className="topCta">
+            Dashboard
+          </Link>
         </nav>
       </header>
 
       <main className="dashMain marketing">
         <section className="plane plane-raised heroPlane">
-          <span className="eyebrow">Commercial SaaS foundation</span>
-          <h1 className="marketingTitle">Make AI visibility measurable and sellable.</h1>
+          <span className="eyebrow">AI visibility platform</span>
+          <h1 className="marketingTitle">Know how AI answers talk about your brand.</h1>
           <p className="lede">
-            Multi-tenant Next.js + Prisma foundation for monitoring brand presence across AI
-            answers and search — with a live demo, score model, and recommendation checklist.
+            kyzen measures brand presence across answer engines, assistants, and search overviews —
+            then ranks the improvements that move coverage, trust, and sentiment.
           </p>
           <div className="heroActions">
-            <Link href="/onboarding" className="btnPrimary">Start setup wizard</Link>
-            <Link href="/dashboard" className="btnGhost">Open dashboard</Link>
-            <Link href="/start" className="btnGhost">Buyer quick start</Link>
+            <Link href="/dashboard" className="btnPrimary">
+              Open dashboard
+            </Link>
+            <Link href="/onboarding" className="btnGhost">
+              Set up workspace
+            </Link>
+            <Link href="/start" className="btnGhost">
+              60-second tour
+            </Link>
           </div>
         </section>
 
@@ -44,22 +48,17 @@ export default function Home() {
         </section>
 
         <section className="plane improveSection">
-          <h2>Launch tracks</h2>
+          <h2>What you can do today</h2>
           <ul className="checklist">
-            {launchTracks.map((track) => (
-              <li key={track}>{track}</li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="plane improveSection">
-          <span className="eyebrow">In-repo readiness</span>
-          <h2>Commercialization checklist</h2>
-          <ul className="checklist">
-            {commercializationChecklist.map((item) => (
+            {productHighlights.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
+          <div className="heroActions" style={{ marginTop: "1.25rem" }}>
+            <Link href="/dashboard" className="btnPrimary">
+              View live Evidence
+            </Link>
+          </div>
         </section>
       </main>
     </div>

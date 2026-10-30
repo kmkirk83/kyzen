@@ -100,11 +100,25 @@ export default function DashboardPage() {
   const [done, setDone] = useState<Record<string, boolean>>({});
 
   const [evidence, setEvidence] = useState<
-    Array<{ id: string; prompt: string; brandName: string; scores: { overall: number }; response: { measuredAt: string; citations: Array<{ title: string }>; provider?: string } }>
+    Array<{
+      id: string;
+      prompt: string;
+      brandName: string;
+      scores: { overall: number };
+      response: {
+        measuredAt: string;
+        citations: Array<{ title: string }>;
+        provider?: string;
+      };
+    }>
   >([]);
-  const [liveAgg, setLiveAgg] = useState<{ overall: number; count: number; persisted?: boolean; providers?: string[] } | null>(null);
+  const [liveAgg, setLiveAgg] = useState<{
+    overall: number;
+    count: number;
+    persisted?: boolean;
+    providers?: string[];
+  } | null>(null);
   const [evidenceLoading, setEvidenceLoading] = useState(true);
-
 
   useEffect(() => {
     try {
@@ -117,7 +131,6 @@ export default function DashboardPage() {
     }
   }, []);
 
-  
   useEffect(() => {
     setEvidenceLoading(true);
     fetch("/api/visibility/measure")
@@ -221,14 +234,21 @@ export default function DashboardPage() {
           </button>
         </div>
         <nav className="sideNav">
-          <Link href="/" onClick={() => setMenuOpen(false)}>Home</Link>
-          <Link href="/start" onClick={() => setMenuOpen(false)}>Buyer quick start</Link>
-          <Link href="/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
-          <a href="/api/visibility/summary" onClick={() => setMenuOpen(false)}>API summary</a>
-          <a href="/api/health" onClick={() => setMenuOpen(false)}>Health</a>
+          <Link href="/" onClick={() => setMenuOpen(false)}>
+            Home
+          </Link>
+          <Link href="/start" onClick={() => setMenuOpen(false)}>
+            Product tour
+          </Link>
+          <Link href="/dashboard" onClick={() => setMenuOpen(false)}>
+            Dashboard
+          </Link>
+          <Link href="/onboarding" onClick={() => setMenuOpen(false)}>
+            Onboarding
+          </Link>
         </nav>
         <p className="sideNote">
-          {mode === "seeded" ? "Seeded tenant snapshot" : "Sample data"} · no DB required
+          {mode === "seeded" ? "Seeded snapshot" : "Sample catalog"}
         </p>
       </aside>
 
@@ -241,17 +261,17 @@ export default function DashboardPage() {
             <>
               <strong>Live measurements{providerLabel}</strong>
               <span>
-                Evidence and aggregates come from {liveAgg.count} run(s)
-                {liveAgg.persisted ? " persisted in Postgres" : " in session memory"}. Sample/Seeded cards remain
-                fixture catalogs for buyer evaluation.
+                Evidence and aggregates from {liveAgg.count} run(s)
+                {liveAgg.persisted ? " stored for this workspace" : " in session memory"}. Score cards
+                above can still use Sample or Seeded catalogs for comparison.
               </span>
             </>
           ) : (
             <>
-              <strong>Sample fixtures</strong>
+              <strong>Catalog scores</strong>
               <span>
-                Score cards below use in-repo sample or seeded catalogs. Complete{" "}
-                <a href="/onboarding">onboarding</a> or POST /api/visibility/measure to populate live Evidence.
+                Score cards use the Sample or Seeded catalog. Run{" "}
+                <a href="/onboarding">onboarding</a> or a measure API call to populate live Evidence.
               </span>
             </>
           )}
@@ -299,15 +319,21 @@ export default function DashboardPage() {
                 </header>
                 <ul className="metricList">
                   <li>
-                    <span><LabelWithInfo infoKey="coverage">Coverage</LabelWithInfo></span>
+                    <span>
+                      <LabelWithInfo infoKey="coverage">Coverage</LabelWithInfo>
+                    </span>
                     <strong>{s.coverage}</strong>
                   </li>
                   <li>
-                    <span><LabelWithInfo infoKey="trust">Trust</LabelWithInfo></span>
+                    <span>
+                      <LabelWithInfo infoKey="trust">Trust</LabelWithInfo>
+                    </span>
                     <strong>{s.trust}</strong>
                   </li>
                   <li>
-                    <span><LabelWithInfo infoKey="sentiment">Sentiment</LabelWithInfo></span>
+                    <span>
+                      <LabelWithInfo infoKey="sentiment">Sentiment</LabelWithInfo>
+                    </span>
                     <strong>{s.sentiment}</strong>
                   </li>
                 </ul>
@@ -364,14 +390,13 @@ export default function DashboardPage() {
           </ul>
         </section>
 
-        
         <section className="improveSection plane" aria-labelledby="evidence-heading">
           <div className="improveHead">
             <h2 id="evidence-heading">Evidence{providerLabel}</h2>
             <p className="improveLede">
               {liveAgg
-                ? `Live aggregate ${liveAgg.overall} from ${liveAgg.count} run(s)${liveAgg.persisted ? " (persisted)" : " (session memory)"}${providerLabel}.`
-                : "No measurements yet. Complete the onboarding wizard or POST /api/visibility/measure."}
+                ? `Live aggregate ${liveAgg.overall} from ${liveAgg.count} run(s)${liveAgg.persisted ? " (persisted)" : " (session)"}${providerLabel}.`
+                : "No measurements yet. Complete onboarding or POST /api/visibility/measure."}
             </p>
           </div>
           {evidenceLoading ? (
@@ -404,14 +429,14 @@ export default function DashboardPage() {
           ) : (
             <div className="emptyEvidence">
               <p className="improveWhy">
-                No live measurement runs yet. Fixture scores above are for evaluation only.
+                No live measurement runs yet. Catalog scores above are for evaluation only.
               </p>
               <div className="heroActions">
                 <a className="btnPrimary" href="/onboarding">
                   Start setup wizard
                 </a>
                 <a className="btnGhost" href="/start">
-                  Buyer quick start
+                  Product tour
                 </a>
               </div>
             </div>
@@ -422,7 +447,7 @@ export default function DashboardPage() {
           <h2>How scoring works</h2>
           <p>
             Each surface scores <code>coverage × 40% + trust × 40% + sentiment × 20%</code>.
-            Seeded mode swaps in a higher-fidelity in-repo tenant snapshot without DATABASE_URL.
+            Sample and Seeded modes provide comparable catalogs; live Evidence comes from the measure API.
           </p>
           <ul>
             {summary.notes.map((n) => (
