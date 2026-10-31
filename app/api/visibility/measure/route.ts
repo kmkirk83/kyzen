@@ -65,6 +65,7 @@ export async function POST(request: NextRequest) {
     prompt?: string;
     surface?: "answer_engines" | "assistants" | "search_overviews";
     organizationId?: string;
+    trackGeoRanks?: boolean;
   };
 
   try {
@@ -89,6 +90,7 @@ export async function POST(request: NextRequest) {
     brandName,
     prompt,
     surface: body.surface,
+    trackGeoRanks: body.trackGeoRanks === true,
   });
 
   return NextResponse.json(run, { status: 201 });
