@@ -32,7 +32,7 @@ export default function StartPage() {
             <Link href="/onboarding" className="btnGhost">
               Run a batch measure
             </Link>
-            <a href="/api/visibility/measure" className="btnGhost">
+            <a href="/api/visibility/measure" className="btnQuiet">
               Measure API
             </a>
           </div>
