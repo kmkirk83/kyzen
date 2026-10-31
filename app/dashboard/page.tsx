@@ -8,6 +8,8 @@ import {
   type DataMode,
   type Improvement,
 } from "@/lib/visibility-summary";
+import { SAMPLE_ENGINE_RANKS } from "@/lib/geo-rank";
+import { GeoRankSection } from "@/packages/geo-rank-tracking/components/GeoRankSection";
 
 const CATEGORY_INFO = {
   visibility: {
@@ -110,6 +112,7 @@ export default function DashboardPage() {
         citations: Array<{ title: string }>;
         provider?: string;
       };
+      engineRanks?: typeof SAMPLE_ENGINE_RANKS;
     }>
   >([]);
   const [liveAgg, setLiveAgg] = useState<{
@@ -179,6 +182,11 @@ export default function DashboardPage() {
   const completedCount = summary.improvements.filter((i) => done[i.id]).length;
 
   const providerLabel = liveAgg?.providers?.includes("mock") ? " (mock provider)" : "";
+
+  // Prefer live engine ranks from the latest run; fall back to sample for demo.
+  const engineRanks =
+    evidence.find((r) => r.engineRanks && r.engineRanks.length > 0)?.engineRanks ??
+    SAMPLE_ENGINE_RANKS;
 
   return (
     <div className="dashRoot">
@@ -441,6 +449,15 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
+
+          {/* GEO Rank Tracking — per-engine mention/citation ranks */}
+          <div className="mt-6">
+            <GeoRankSection
+              ranks={engineRanks}
+              isLoading={evidenceLoading}
+              trackGeoRanksEnabled={true}
+            />
+          </div>
         </section>
 
         <section className="howSection">
@@ -448,6 +465,7 @@ export default function DashboardPage() {
           <p>
             Each surface scores <code>coverage × 40% + trust × 40% + sentiment × 20%</code>.
             Sample and Seeded modes provide comparable catalogs; live Evidence comes from the measure API.
+            Engine Rankings show mention and citation position across major AI models when GEO tracking is enabled.
           </p>
           <ul>
             {summary.notes.map((n) => (
