@@ -7,11 +7,14 @@
  * 1. OpenAI when OPENAI_API_KEY is set
  * 2. Anthropic when ANTHROPIC_API_KEY is set
  * 3. Deterministic mock (always available for demo / sale evaluation)
+ *
+ * GEO Rank Tracking: when trackGeoRanks is true, attaches per-engine ranks.
  */
 
 import { compositeScore } from "@/lib/visibility-summary";
+import { mockEngineRanks, type EngineRank } from "@/lib/geo-rank";
 
-export const SCORING_VERSION = "v1.1.0";
+export const SCORING_VERSION = "v1.2.0";
 
 export type Citation = {
   url: string;
@@ -43,6 +46,9 @@ export type MeasurementRun = {
   };
   scoringVersion: string;
   createdAt: string;
+  /** Present when trackGeoRanks was enabled for this run */
+  engineRanks?: EngineRank[];
+  trackGeoRanks?: boolean;
 };
 
 const memoryStore: MeasurementRun[] = [];
@@ -329,10 +335,15 @@ export async function runMeasurement(input: {
   brandName: string;
   prompt: string;
   surface?: MeasurementRun["surface"];
+  trackGeoRanks?: boolean;
 }): Promise<MeasurementRun> {
   const response = await resolveProviderResponse(input.brandName, input.prompt);
   const scores = scoreFromResponse(response, input.brandName);
   const surface = input.surface ?? "answer_engines";
+  const trackGeoRanks = Boolean(input.trackGeoRanks);
+  const engineRanks = trackGeoRanks
+    ? mockEngineRanks(input.brandName, input.prompt)
+    : undefined;
 
   if (hasDatabase()) {
     try {
@@ -357,7 +368,12 @@ export async function runMeasurement(input: {
           measuredAt: new Date(response.measuredAt),
         },
       });
-      return toRun(row);
+      const run = toRun(row);
+      if (engineRanks) {
+        run.engineRanks = engineRanks;
+        run.trackGeoRanks = true;
+      }
+      return run;
     } catch (err) {
       console.error("Prisma persist failed, using memory store", err);
     }
@@ -374,6 +390,8 @@ export async function runMeasurement(input: {
     scores,
     scoringVersion: SCORING_VERSION,
     createdAt: new Date().toISOString(),
+    trackGeoRanks: trackGeoRanks || undefined,
+    engineRanks,
   };
   memoryStore.unshift(run);
   if (memoryStore.length > 200) memoryStore.length = 200;
