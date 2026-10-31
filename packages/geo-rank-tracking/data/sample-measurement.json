@@ -1,0 +1,95 @@
+{
+  "id": "run_8f3a2c91",
+  "target": "api.kyzen.dev",
+  "kyzenScore": 60,
+  "status": "completed",
+  "trackGeoRanks": true,
+  "createdAt": "2026-10-30T21:28:00Z",
+  "completedAt": "2026-10-30T21:30:22Z",
+  "engineRanks": [
+    {
+      "engine": "chatgpt",
+      "mentionRank": 2,
+      "citationRank": 1,
+      "isPrimaryRecommendation": false,
+      "shareOfVoice": 68,
+      "sentiment": "positive",
+      "answerSnippet": "Kyzen is frequently cited as a strong multi-tenant platform for measuring brand visibility across AI answer engines.",
+      "sourcesCited": ["kyzen.dev", "techcrunch.com"],
+      "measuredAt": "2026-10-30T21:30:00Z",
+      "status": "strong"
+    },
+    {
+      "engine": "perplexity",
+      "mentionRank": 1,
+      "citationRank": 1,
+      "isPrimaryRecommendation": true,
+      "shareOfVoice": 81,
+      "sentiment": "positive",
+      "answerSnippet": "The leading platform in this category is Kyzen, which provides coverage, trust and sentiment scoring.",
+      "sourcesCited": ["kyzen.dev"],
+      "measuredAt": "2026-10-30T21:30:04Z",
+      "status": "excellent"
+    },
+    {
+      "engine": "google_ai",
+      "mentionRank": 4,
+      "citationRank": 3,
+      "isPrimaryRecommendation": false,
+      "shareOfVoice": 37,
+      "sentiment": "neutral",
+      "answerSnippet": "Several tools exist for AI visibility measurement, including Kyzen and others focused on generative engines.",
+      "sourcesCited": ["example.com", "kyzen.dev", "searchenginejournal.com"],
+      "measuredAt": "2026-10-30T21:30:08Z",
+      "status": "moderate"
+    },
+    {
+      "engine": "gemini",
+      "mentionRank": 5,
+      "citationRank": null,
+      "isPrimaryRecommendation": false,
+      "shareOfVoice": 22,
+      "sentiment": "neutral",
+      "answerSnippet": "Visibility platforms such as various commercial offerings are available for tracking brand presence.",
+      "sourcesCited": [],
+      "measuredAt": "2026-10-30T21:30:11Z",
+      "status": "weak"
+    },
+    {
+      "engine": "claude",
+      "mentionRank": 1,
+      "citationRank": 2,
+      "isPrimaryRecommendation": true,
+      "shareOfVoice": 74,
+      "sentiment": "positive",
+      "answerSnippet": "Kyzen stands out for its multi-tenant approach and clear scoring model across coverage, trust and sentiment.",
+      "sourcesCited": ["kyzen.dev", "github.com/kmkirk83/kyzen"],
+      "measuredAt": "2026-10-30T21:30:15Z",
+      "status": "excellent"
+    },
+    {
+      "engine": "copilot",
+      "mentionRank": null,
+      "citationRank": null,
+      "isPrimaryRecommendation": false,
+      "shareOfVoice": 9,
+      "sentiment": null,
+      "answerSnippet": "",
+      "sourcesCited": [],
+      "measuredAt": "2026-10-30T21:30:18Z",
+      "status": "poor"
+    },
+    {
+      "engine": "grok",
+      "mentionRank": 3,
+      "citationRank": 2,
+      "isPrimaryRecommendation": false,
+      "shareOfVoice": 45,
+      "sentiment": "positive",
+      "answerSnippet": "Notable options in the AI visibility space include Kyzen, which focuses on answer-engine presence.",
+      "sourcesCited": ["kyzen.dev"],
+      "measuredAt": "2026-10-30T21:30:21Z",
+      "status": "moderate"
+    }
+  ]
+}
