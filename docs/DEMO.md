@@ -46,18 +46,18 @@ Screenshots available in agent artifacts for this verification run. HUMAN: attac
 
 Record at 1080p; link the video URL in README when uploaded.
 
-## Latest verification (2026-10-31 05:12 UTC)
+## Latest verification (2026-11-01 05:12 UTC)
 
-- GET `/api/visibility/measure` (default org `org_acme_demo`) returns 42 runs, aggregate count 42, `persisted: true`, providers: ["mock"].
-- Dashboard Evidence panel displays live aggregate and multiple persisted runs. Mock provider is labeled in the Evidence banner and heading ("LIVE MEASUREMENTS (MOCK PROVIDER)").
+- GET `/api/visibility/measure` (default org `org_acme_demo`) returns 44 runs, aggregate count 44, `persisted: true`, providers: ["mock"].
+- Dashboard Evidence panel displays live aggregate and multiple persisted runs. Mock provider is labeled in the Evidence banner and heading ("EVIDENCE (MOCK PROVIDER)").
 - Batch measure `POST /api/visibility/measure/batch` with brandName + prompts array succeeds and persists; subsequent GET returns the new runs.
 - Health endpoint returns `{"status":"ok","service":"kyzen","version":"0.3.0"}`.
 - Production deployment on Vercel is READY (latest main commits).
 - PWA assets present: `/manifest.webmanifest`, `/sw.js`, icons; service worker registration in layout.
 - Dependabot major-version freeze configured in `.github/dependabot.yml`.
-- **CI blocker:** GitHub Actions runs fail with "account is locked due to a billing issue" (ubuntu-latest). Workflows themselves are valid; billing must be resolved on the owner account for green CI. Vercel production deploys continue independently.
+- **CI blocker:** GitHub Actions runs fail with "account is locked due to a billing issue" (ubuntu-latest). Workflows themselves are valid; billing must be resolved on the owner account for green CI. Vercel production deploys continue independently. See docs/CI_WORKAROUNDS.md.
 - Walkthrough assets produced this run: start.png, dashboard.png, onboarding.png (MP4 blocked on drawtext).
 
 ## Seeded live demo note
 
-Public demo org `org_acme_demo` has persisted evaluation runs (including Kyzen-brand prompts). Dashboard Evidence should show them without authentication when the deployment has `DATABASE_URL`. Current dashboard reports 42+ live mock-provider runs persisted in Postgres.
+Public demo org `org_acme_demo` has persisted evaluation runs (including Kyzen-brand prompts). Dashboard Evidence should show them without authentication when the deployment has `DATABASE_URL`. Current dashboard reports 44+ live mock-provider runs persisted in Postgres.
