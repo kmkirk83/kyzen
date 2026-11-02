@@ -8,26 +8,59 @@ Alternate project URL may appear in older docs; prefer the primary above.
 
 ## Enabling live measurement (Milestone 1)
 
-The public demo runs the **mock** provider by default so evaluators need no API keys. To produce real, persisted, traceable evidence from the deployed application:
+The public demo runs the **mock** provider by default so evaluators need no API keys. To produce real, persisted, traceable evidence from the deployed application, follow these steps in order.
 
-1. In the Vercel project (or self-hosted environment) set at least one of:
-   - `OPENAI_API_KEY` (preferred) + optional `OPENAI_MODEL` (default `gpt-4o-mini`)
-   - `ANTHROPIC_API_KEY` + optional `ANTHROPIC_MODEL` (default `claude-3-5-haiku-latest`)
-2. Ensure `DATABASE_URL` points at a reachable Postgres (Neon is already used on the public demo).
-3. Redeploy.
-4. Trigger a measurement via:
-   - Onboarding wizard → Measure step, or
-   - `POST /api/visibility/measure` with `{ "brandName": "...", "prompt": "..." }`, or
-   - `POST /api/visibility/measure/batch`
-5. Confirm:
-   - `GET /api/visibility/measure` returns runs whose `response.provider` is `openai` or `anthropic`
-   - Aggregate includes `liveCount` > 0 and `providers` contains the live provider
-   - Evidence panel shows the new runs with live provenance
-   - Each run contains `rawText` (full provider response) and structured `evidence` (`mentioned`, `mentionCount`, `firstMentionOffset`, `isLive`)
+### 0. Create a free / trial provider key
+
+You need at least one of the following. Both providers offer free credits or trial access sufficient for verification runs.
+
+**OpenAI (preferred)**  
+1. Go to [https://platform.openai.com/signup](https://platform.openai.com/signup) (or log in).  
+2. Open **API keys** → **Create new secret key**.  
+3. Copy the key (shown only once).  
+4. Optional: set a monthly budget / usage limit in the billing settings to avoid unexpected charges.  
+5. Free-tier / new-account credits are normally enough for dozens of measurement runs.
+
+**Anthropic (alternative)**  
+1. Go to [https://console.anthropic.com/](https://console.anthropic.com/).  
+2. Create an account or log in.  
+3. Navigate to **API Keys** → create a key.  
+4. Copy the key.  
+5. New accounts typically receive free credits suitable for testing.
+
+Store the key securely. Do not commit it to the repository.
+
+### 1. Configure the key on the deployment
+
+In the Vercel project (or self-hosted environment) set at least one of:
+
+- `OPENAI_API_KEY` (preferred) + optional `OPENAI_MODEL` (default `gpt-4o-mini`)
+- `ANTHROPIC_API_KEY` + optional `ANTHROPIC_MODEL` (default `claude-3-5-haiku-latest`)
+
+### 2. Confirm database connectivity
+
+Ensure `DATABASE_URL` points at a reachable Postgres instance (Neon is already used on the public demo).
+
+### 3. Redeploy
+
+Trigger a new deployment so the environment variables take effect.
+
+### 4. Trigger a measurement
+
+- Onboarding wizard → Measure step, or  
+- `POST /api/visibility/measure` with `{ "brandName": "...", "prompt": "..." }`, or  
+- `POST /api/visibility/measure/batch`
+
+### 5. Confirm live evidence
+
+- `GET /api/visibility/measure` returns runs whose `response.provider` is `openai` or `anthropic`
+- Aggregate includes `liveCount` > 0 and `providers` contains the live provider
+- Evidence panel shows the new runs with live provenance (live badge, mention status)
+- Each run contains `rawText` (full provider response) and structured `evidence` (`mentioned`, `mentionCount`, `firstMentionOffset`, `isLive`)
 
 Provider resolution order is fixed: OpenAI → Anthropic → mock. Live calls are logged with `[measurement] using live provider=...`. Failures fall back to mock so the product never blocks evaluation.
 
-Readiness endpoint (`GET /api/readiness`) already surfaces whether any AI provider key is configured.
+Readiness endpoint (`GET /api/readiness`) already surfaces whether any AI provider key is configured and whether live measurement is ready.
 
 **Important:** Action Center and Content Agent work must wait until this live evidence path is verified. They are only defensible when they operate on persisted, re-runnable evidence.
 
