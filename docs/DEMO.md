@@ -6,6 +6,31 @@
 
 Alternate project URL may appear in older docs; prefer the primary above.
 
+## Enabling live measurement (Milestone 1)
+
+The public demo runs the **mock** provider by default so evaluators need no API keys. To produce real, persisted, traceable evidence from the deployed application:
+
+1. In the Vercel project (or self-hosted environment) set at least one of:
+   - `OPENAI_API_KEY` (preferred) + optional `OPENAI_MODEL` (default `gpt-4o-mini`)
+   - `ANTHROPIC_API_KEY` + optional `ANTHROPIC_MODEL` (default `claude-3-5-haiku-latest`)
+2. Ensure `DATABASE_URL` points at a reachable Postgres (Neon is already used on the public demo).
+3. Redeploy.
+4. Trigger a measurement via:
+   - Onboarding wizard → Measure step, or
+   - `POST /api/visibility/measure` with `{ "brandName": "...", "prompt": "..." }`, or
+   - `POST /api/visibility/measure/batch`
+5. Confirm:
+   - `GET /api/visibility/measure` returns runs whose `response.provider` is `openai` or `anthropic`
+   - Aggregate includes `liveCount` > 0 and `providers` contains the live provider
+   - Evidence panel shows the new runs with live provenance
+   - Each run contains `rawText` (full provider response) and structured `evidence` (`mentioned`, `mentionCount`, `firstMentionOffset`, `isLive`)
+
+Provider resolution order is fixed: OpenAI → Anthropic → mock. Live calls are logged with `[measurement] using live provider=...`. Failures fall back to mock so the product never blocks evaluation.
+
+Readiness endpoint (`GET /api/readiness`) already surfaces whether any AI provider key is configured.
+
+**Important:** Action Center and Content Agent work must wait until this live evidence path is verified. They are only defensible when they operate on persisted, re-runnable evidence.
+
 ## Super demo click path (buyer)
 
 1. **Start** — https://kyzen-demo.vercel.app/start  

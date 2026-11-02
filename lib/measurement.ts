@@ -8,13 +8,17 @@
  * 2. Anthropic when ANTHROPIC_API_KEY is set
  * 3. Deterministic mock (always available for demo / sale evaluation)
  *
+ * Milestone 1 focus: live measurement from the deployed application must produce
+ * persisted, traceable evidence (rawText + structured mention signals) before any
+ * Action Center or Content Agent work.
+ *
  * GEO Rank Tracking: when trackGeoRanks is true, attaches per-engine ranks.
  */
 
 import { compositeScore } from "@/lib/visibility-summary";
 import { mockEngineRanks, type EngineRank } from "@/lib/geo-rank";
 
-export const SCORING_VERSION = "v1.2.0";
+export const SCORING_VERSION = "v1.2.1";
 
 export type Citation = {
   url: string;
@@ -44,6 +48,13 @@ export type MeasurementRun = {
     sentiment: number;
     overall: number;
   };
+  /** Structured evidence extracted from rawText (Milestone 1) */
+  evidence?: {
+    mentioned: boolean;
+    mentionCount: number;
+    firstMentionOffset: number | null;
+    isLive: boolean;
+  };
   scoringVersion: string;
   createdAt: string;
   /** Present when trackGeoRanks was enabled for this run */
@@ -69,6 +80,24 @@ function extractUrls(text: string): Citation[] {
     title: url.replace(/^https?:\/\//, "").split("/")[0] || "source",
     snippet: "Extracted from provider response.",
   }));
+}
+
+/** Extract structured mention signals from raw provider text. */
+export function extractMentionEvidence(rawText: string, brandName: string) {
+  const text = rawText || "";
+  const brand = brandName.trim();
+  if (!brand) {
+    return { mentioned: false, mentionCount: 0, firstMentionOffset: null as number | null };
+  }
+  const lower = text.toLowerCase();
+  const brandLower = brand.toLowerCase();
+  const mentionCount = Math.max(0, lower.split(brandLower).length - 1);
+  const firstIdx = lower.indexOf(brandLower);
+  return {
+    mentioned: mentionCount > 0,
+    mentionCount,
+    firstMentionOffset: firstIdx >= 0 ? firstIdx : null,
+  };
 }
 
 export function mockProviderRespond(brandName: string, prompt: string): ProviderResponse {
@@ -133,7 +162,7 @@ async function openaiRespond(brandName: string, prompt: string): Promise<Provide
     });
 
     if (!res.ok) {
-      console.error("OpenAI measurement failed", res.status, await res.text());
+      console.error("[measurement] OpenAI failed", res.status, await res.text());
       return null;
     }
 
@@ -160,7 +189,7 @@ async function openaiRespond(brandName: string, prompt: string): Promise<Provide
       measuredAt: new Date().toISOString(),
     };
   } catch (err) {
-    console.error("OpenAI measurement error", err);
+    console.error("[measurement] OpenAI error", err);
     return null;
   }
 }
@@ -197,7 +226,7 @@ async function anthropicRespond(brandName: string, prompt: string): Promise<Prov
     });
 
     if (!res.ok) {
-      console.error("Anthropic measurement failed", res.status, await res.text());
+      console.error("[measurement] Anthropic failed", res.status, await res.text());
       return null;
     }
 
@@ -229,7 +258,7 @@ async function anthropicRespond(brandName: string, prompt: string): Promise<Prov
       measuredAt: new Date().toISOString(),
     };
   } catch (err) {
-    console.error("Anthropic measurement error", err);
+    console.error("[measurement] Anthropic error", err);
     return null;
   }
 }
@@ -240,23 +269,57 @@ export async function resolveProviderResponse(
   prompt: string,
 ): Promise<ProviderResponse> {
   const openai = await openaiRespond(brandName, prompt);
-  if (openai) return openai;
+  if (openai) {
+    console.info("[measurement] using live provider=openai");
+    return openai;
+  }
   const anthropic = await anthropicRespond(brandName, prompt);
-  if (anthropic) return anthropic;
+  if (anthropic) {
+    console.info("[measurement] using live provider=anthropic");
+    return anthropic;
+  }
+  console.info("[measurement] falling back to mock provider (no live keys or call failed)");
   return mockProviderRespond(brandName, prompt);
 }
 
+/** Public helper for readiness / diagnostics. */
+export function getProviderCapabilities() {
+  return {
+    openaiConfigured: Boolean(process.env.OPENAI_API_KEY?.trim()),
+    anthropicConfigured: Boolean(process.env.ANTHROPIC_API_KEY?.trim()),
+    livePreferred: Boolean(
+      process.env.OPENAI_API_KEY?.trim() || process.env.ANTHROPIC_API_KEY?.trim(),
+    ),
+    openaiModel: process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini",
+    anthropicModel: process.env.ANTHROPIC_MODEL?.trim() || "claude-3-5-haiku-latest",
+  };
+}
+
 export function scoreFromResponse(response: ProviderResponse, brandName: string) {
+  const mention = extractMentionEvidence(response.rawText, brandName);
   const text = response.rawText.toLowerCase();
-  const brand = brandName.toLowerCase();
-  const mentionCount = Math.max(0, text.split(brand).length - 1);
-  const coverage = Math.min(100, 15 + mentionCount * 22 + response.citations.length * 8);
-  const trust = Math.min(100, 20 + response.citations.length * 18 + (response.provider === "mock" ? 5 : 12));
+  const coverage = Math.min(
+    100,
+    15 + mention.mentionCount * 22 + response.citations.length * 8,
+  );
+  // Live providers receive a modest trust boost; mock remains usable for demos.
+  const trust = Math.min(
+    100,
+    20 +
+      response.citations.length * 18 +
+      (response.provider === "mock" ? 5 : 15),
+  );
   const positive = (text.match(/\b(strong|leading|trusted|quality|recommended)\b/g) || []).length;
   const negative = (text.match(/\b(weak|unknown|absent|poor|missing)\b/g) || []).length;
-  const sentiment = Math.max(0, Math.min(100, 50 + positive * 12 - negative * 15 + (mentionCount > 0 ? 10 : -10)));
+  const sentiment = Math.max(
+    0,
+    Math.min(
+      100,
+      50 + positive * 12 - negative * 15 + (mention.mentioned ? 10 : -10),
+    ),
+  );
   const overall = compositeScore(coverage, trust, sentiment);
-  return { coverage, trust, sentiment, overall };
+  return { coverage, trust, sentiment, overall, evidence: { ...mention, isLive: response.provider !== "mock" } };
 }
 
 type EvalRow = {
@@ -286,6 +349,14 @@ function toRun(row: EvalRow): MeasurementRun {
   } catch {
     citations = [];
   }
+  const response: ProviderResponse = {
+    provider: row.provider as ProviderResponse["provider"],
+    model: row.model,
+    rawText: row.rawResponse,
+    citations,
+    measuredAt: row.measuredAt.toISOString(),
+  };
+  const mention = extractMentionEvidence(row.rawResponse, row.brandName);
   return {
     id: row.id,
     organizationId: row.organizationId,
@@ -293,18 +364,18 @@ function toRun(row: EvalRow): MeasurementRun {
     brandName: row.brandName,
     prompt: row.prompt,
     surface: (row.surface as MeasurementRun["surface"]) || "answer_engines",
-    response: {
-      provider: row.provider as ProviderResponse["provider"],
-      model: row.model,
-      rawText: row.rawResponse,
-      citations,
-      measuredAt: row.measuredAt.toISOString(),
-    },
+    response,
     scores: {
       coverage: row.coverage,
       trust: row.trust,
       sentiment: row.sentiment,
       overall: row.overall,
+    },
+    evidence: {
+      mentioned: mention.mentioned,
+      mentionCount: mention.mentionCount,
+      firstMentionOffset: mention.firstMentionOffset,
+      isLive: row.provider !== "mock",
     },
     scoringVersion: row.scoringVersion,
     createdAt: row.createdAt.toISOString(),
@@ -338,7 +409,8 @@ export async function runMeasurement(input: {
   trackGeoRanks?: boolean;
 }): Promise<MeasurementRun> {
   const response = await resolveProviderResponse(input.brandName, input.prompt);
-  const scores = scoreFromResponse(response, input.brandName);
+  const scored = scoreFromResponse(response, input.brandName);
+  const { evidence, ...scores } = scored;
   const surface = input.surface ?? "answer_engines";
   const trackGeoRanks = Boolean(input.trackGeoRanks);
   const engineRanks = trackGeoRanks
@@ -369,13 +441,14 @@ export async function runMeasurement(input: {
         },
       });
       const run = toRun(row);
+      run.evidence = evidence;
       if (engineRanks) {
         run.engineRanks = engineRanks;
         run.trackGeoRanks = true;
       }
       return run;
     } catch (err) {
-      console.error("Prisma persist failed, using memory store", err);
+      console.error("[measurement] Prisma persist failed, using memory store", err);
     }
   }
 
@@ -388,6 +461,7 @@ export async function runMeasurement(input: {
     surface,
     response,
     scores,
+    evidence,
     scoringVersion: SCORING_VERSION,
     createdAt: new Date().toISOString(),
     trackGeoRanks: trackGeoRanks || undefined,
@@ -409,7 +483,7 @@ export async function listMeasurements(organizationId: string): Promise<Measurem
       });
       return rows.map(toRun);
     } catch (err) {
-      console.error("Prisma list failed", err);
+      console.error("[measurement] Prisma list failed", err);
     }
   }
   return memoryStore.filter((r) => r.organizationId === organizationId);
@@ -437,8 +511,10 @@ export async function aggregateOrgScores(organizationId: string) {
   const trust = Math.round(runs.reduce((t, r) => t + r.scores.trust, 0) / runs.length);
   const sentiment = Math.round(runs.reduce((t, r) => t + r.scores.sentiment, 0) / runs.length);
   const providers = Array.from(new Set(runs.map((r) => r.response.provider)));
+  const liveCount = runs.filter((r) => r.response.provider !== "mock").length;
   return {
     count: runs.length,
+    liveCount,
     coverage,
     trust,
     sentiment,
