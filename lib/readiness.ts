@@ -1,8 +1,10 @@
 import { readAppEnv } from "@/lib/env";
+import { getProviderCapabilities } from "@/lib/measurement";
 
 export function getReadinessReport() {
   const envResult = readAppEnv();
   const env = envResult.success ? envResult.data : undefined;
+  const caps = getProviderCapabilities();
 
   const checks = [
     {
@@ -17,8 +19,10 @@ export function getReadinessReport() {
     },
     {
       name: "aiProviders",
-      configured: Boolean(env?.OPENAI_API_KEY || env?.ANTHROPIC_API_KEY),
-      description: "At least one AI provider key is configured for scoring workflows.",
+      configured: caps.livePreferred,
+      description: caps.livePreferred
+        ? `Live measurement ready (OpenAI: ${caps.openaiConfigured ? "yes" : "no"}, Anthropic: ${caps.anthropicConfigured ? "yes" : "no"}).`
+        : "No AI provider keys configured — measurements will use the deterministic mock provider.",
     },
     {
       name: "telegramConnector",
@@ -46,5 +50,12 @@ export function getReadinessReport() {
     configuredChecks: checks.filter((check) => check.configured).length,
     totalChecks: checks.length,
     checks,
+    liveMeasurement: {
+      ready: caps.livePreferred,
+      openaiConfigured: caps.openaiConfigured,
+      anthropicConfigured: caps.anthropicConfigured,
+      openaiModel: caps.openaiModel,
+      anthropicModel: caps.anthropicModel,
+    },
   };
 }

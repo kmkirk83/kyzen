@@ -17,6 +17,11 @@ type ReadinessPayload = {
     configuredChecks: number;
     totalChecks: number;
     checks: ReadinessCheck[];
+    liveMeasurement?: {
+      ready: boolean;
+      openaiConfigured: boolean;
+      anthropicConfigured: boolean;
+    };
   };
 };
 
@@ -118,6 +123,7 @@ export default function OnboardingPage() {
   const checks = readiness?.readiness?.checks ?? [];
   const configuredCount = readiness?.readiness?.configuredChecks ?? 0;
   const totalChecks = readiness?.readiness?.totalChecks ?? 0;
+  const liveReady = readiness?.readiness?.liveMeasurement?.ready ?? false;
 
   const orgValid = useMemo(() => {
     return (
@@ -183,7 +189,9 @@ export default function OnboardingPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `Measure failed (${res.status})`);
       setMeasureCount(data.count || promptList.length);
-      setMeasureMessage(`Created ${data.count || promptList.length} measurement run(s). Open dashboard Evidence to view.`);
+      setMeasureMessage(
+        `Created ${data.count || promptList.length} measurement run(s). Open dashboard Evidence to view (live when provider keys are configured).`,
+      );
       setStep(4);
     } catch (err) {
       setMeasureMessage(err instanceof Error ? err.message : "Unable to run measurements");
@@ -246,6 +254,9 @@ export default function OnboardingPage() {
           <p className="improveWhy">
             Live status from <code>GET /api/readiness</code>. Missing items are optional for
             sample-data evaluation; they become required for production tenants.
+            {liveReady
+              ? " Live measurement is ready (provider key detected)."
+              : " No provider keys detected — measurements will use the mock provider until keys are added."}
           </p>
 
           <div className="heroActions" style={{ marginBottom: "1rem" }}>
@@ -378,8 +389,11 @@ export default function OnboardingPage() {
         <section className="plane improveSection">
           <h2>3. Brand and batch measure</h2>
           <p className="improveWhy">
-            Enter a brand and one or more prompts (one per line). This calls POST /api/visibility/measure/batch
-            (mock provider by default) and persists runs for the current tenant. They appear under Evidence on the dashboard.
+            Enter a brand and one or more prompts (one per line). This calls{" "}
+            <code>POST /api/visibility/measure/batch</code>. When{" "}
+            <code>OPENAI_API_KEY</code> or <code>ANTHROPIC_API_KEY</code> is configured, live
+            provider responses are used and persisted; otherwise the deterministic mock provider
+            is used. Runs appear under Evidence on the dashboard with structured mention evidence.
           </p>
           <div className="onboardForm">
             <label>

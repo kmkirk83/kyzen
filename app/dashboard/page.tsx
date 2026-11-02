@@ -96,28 +96,37 @@ function LabelWithInfo({
   );
 }
 
+type EvidenceRun = {
+  id: string;
+  prompt: string;
+  brandName: string;
+  scores: { overall: number; coverage?: number; trust?: number; sentiment?: number };
+  response: {
+    measuredAt: string;
+    citations: Array<{ title: string; url?: string }>;
+    provider?: string;
+    model?: string;
+    rawText?: string;
+  };
+  evidence?: {
+    mentioned: boolean;
+    mentionCount: number;
+    firstMentionOffset: number | null;
+    isLive: boolean;
+  };
+  engineRanks?: typeof SAMPLE_ENGINE_RANKS;
+};
+
 export default function DashboardPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mode, setMode] = useState<DataMode>("sample");
   const [done, setDone] = useState<Record<string, boolean>>({});
 
-  const [evidence, setEvidence] = useState<
-    Array<{
-      id: string;
-      prompt: string;
-      brandName: string;
-      scores: { overall: number };
-      response: {
-        measuredAt: string;
-        citations: Array<{ title: string }>;
-        provider?: string;
-      };
-      engineRanks?: typeof SAMPLE_ENGINE_RANKS;
-    }>
-  >([]);
+  const [evidence, setEvidence] = useState<EvidenceRun[]>([]);
   const [liveAgg, setLiveAgg] = useState<{
     overall: number;
     count: number;
+    liveCount?: number;
     persisted?: boolean;
     providers?: string[];
   } | null>(null);
@@ -139,7 +148,7 @@ export default function DashboardPage() {
     fetch("/api/visibility/measure")
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data.runs)) setEvidence(data.runs.slice(0, 8));
+        if (Array.isArray(data.runs)) setEvidence(data.runs.slice(0, 12));
         if (data.aggregate) setLiveAgg(data.aggregate);
       })
       .catch(() => {})
@@ -181,7 +190,13 @@ export default function DashboardPage() {
 
   const completedCount = summary.improvements.filter((i) => done[i.id]).length;
 
-  const providerLabel = liveAgg?.providers?.includes("mock") ? " (mock provider)" : "";
+  const hasLive = Boolean(liveAgg?.liveCount && liveAgg.liveCount > 0);
+  const providers = liveAgg?.providers ?? [];
+  const providerLabel = hasLive
+    ? ` (live: ${providers.filter((p) => p !== "mock").join(", ") || "provider"})`
+    : providers.includes("mock")
+      ? " (mock provider)"
+      : "";
 
   // Prefer live engine ranks from the latest run; fall back to sample for demo.
   const engineRanks =
@@ -267,9 +282,15 @@ export default function DashboardPage() {
         >
           {liveAgg && liveAgg.count > 0 ? (
             <>
-              <strong>Live measurements{providerLabel}</strong>
+              <strong>
+                {hasLive ? "Live measurements" : "Measurements"}
+                {providerLabel}
+              </strong>
               <span>
                 Evidence and aggregates from {liveAgg.count} run(s)
+                {typeof liveAgg.liveCount === "number"
+                  ? ` (${liveAgg.liveCount} live)`
+                  : ""}
                 {liveAgg.persisted ? " stored for this workspace" : " in session memory"}. Score cards
                 above can still use Sample or Seeded catalogs for comparison.
               </span>
@@ -403,7 +424,9 @@ export default function DashboardPage() {
             <h2 id="evidence-heading">Evidence{providerLabel}</h2>
             <p className="improveLede">
               {liveAgg
-                ? `Live aggregate ${liveAgg.overall} from ${liveAgg.count} run(s)${liveAgg.persisted ? " (persisted)" : " (session)"}${providerLabel}.`
+                ? `Aggregate ${liveAgg.overall} from ${liveAgg.count} run(s)${
+                    typeof liveAgg.liveCount === "number" ? ` · ${liveAgg.liveCount} live` : ""
+                  }${liveAgg.persisted ? " (persisted)" : " (session)"}${providerLabel}.`
                 : "No measurements yet. Complete onboarding or POST /api/visibility/measure."}
             </p>
           </div>
@@ -415,24 +438,47 @@ export default function DashboardPage() {
             </div>
           ) : evidence.length > 0 ? (
             <ul className="improveList">
-              {evidence.map((run) => (
-                <li key={run.id} className="improveCard">
-                  <div className="improveTop">
-                    <span className="impactTag">{run.brandName}</span>
-                    <span className={`surfaceScore tone-${scoreTone(run.scores.overall)}`}>
-                      {run.scores.overall}
-                    </span>
-                  </div>
-                  <h3>{run.prompt}</h3>
-                  <p className="improveWhy">
-                    {run.response.measuredAt?.slice(0, 19).replace("T", " ")}
-                    {run.response.citations?.length
-                      ? ` · ${run.response.citations.length} citation(s)`
-                      : ""}
-                    {run.response.provider ? ` · ${run.response.provider}` : ""}
-                  </p>
-                </li>
-              ))}
+              {evidence.map((run) => {
+                const isLive = run.evidence?.isLive ?? run.response.provider !== "mock";
+                const mentioned = run.evidence?.mentioned;
+                const mentionCount = run.evidence?.mentionCount;
+                return (
+                  <li key={run.id} className="improveCard">
+                    <div className="improveTop">
+                      <span className="impactTag">{run.brandName}</span>
+                      <span
+                        className={`priorityPill ${isLive ? "priority-high" : "priority-low"}`}
+                        title={isLive ? "Live provider response" : "Mock / demo response"}
+                      >
+                        {isLive ? "live" : "mock"}
+                      </span>
+                      <span className={`surfaceScore tone-${scoreTone(run.scores.overall)}`}>
+                        {run.scores.overall}
+                      </span>
+                    </div>
+                    <h3>{run.prompt}</h3>
+                    <p className="improveWhy">
+                      {run.response.measuredAt?.slice(0, 19).replace("T", " ")}
+                      {run.response.provider ? ` · ${run.response.provider}` : ""}
+                      {run.response.model ? ` / ${run.response.model}` : ""}
+                      {run.response.citations?.length
+                        ? ` · ${run.response.citations.length} citation(s)`
+                        : ""}
+                      {typeof mentioned === "boolean"
+                        ? mentioned
+                          ? ` · mentioned${typeof mentionCount === "number" ? ` ×${mentionCount}` : ""}`
+                          : " · not mentioned"
+                        : ""}
+                    </p>
+                    {run.response.rawText && (
+                      <p className="improveWhy" style={{ marginTop: "0.35rem", opacity: 0.85 }}>
+                        {run.response.rawText.slice(0, 180)}
+                        {run.response.rawText.length > 180 ? "…" : ""}
+                      </p>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           ) : (
             <div className="emptyEvidence">
@@ -466,6 +512,7 @@ export default function DashboardPage() {
             Each surface scores <code>coverage × 40% + trust × 40% + sentiment × 20%</code>.
             Sample and Seeded modes provide comparable catalogs; live Evidence comes from the measure API.
             Engine Rankings show mention and citation position across major AI models when GEO tracking is enabled.
+            Structured evidence (mentioned, mentionCount, isLive) is attached to every measurement run.
           </p>
           <ul>
             {summary.notes.map((n) => (
