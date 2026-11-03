@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { PwaRegister } from "./components/PwaRegister";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "kyzen | AI Visibility Intelligence",
@@ -47,6 +48,7 @@ export default function RootLayout({
       <body>
         {children}
         <PwaRegister />
+        <Analytics />
       </body>
     </html>
   );
