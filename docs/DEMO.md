@@ -104,14 +104,14 @@ Screenshots available in agent artifacts for this verification run. HUMAN: attac
 
 Record at 1080p; link the video URL in README when uploaded.
 
-## Latest verification (2026-11-02 05:14 UTC)
+## Latest verification (2026-11-04 06:13 UTC)
 
-- GET `/api/visibility/measure` (default org `org_acme_demo`) returns 44+ runs, aggregate count 44, `persisted: true`, providers: ["mock"].
-- Dashboard Evidence panel (client-rendered) displays live aggregate and multiple persisted runs. Mock provider is labeled in the Evidence banner and heading ("EVIDENCE (MOCK PROVIDER)").
-- Full onboarding wizard E2E confirmed: Welcome → Environment (2/6 ready) → Organization (persisted) → Measure (brand KyzenSaleTest + 2 prompts) → batch POST succeeds, 2 runs created, Ready step shown. Subsequent dashboard Evidence reflects new runs.
-- Batch measure `POST /api/visibility/measure/batch` with brandName + prompts array succeeds and persists; subsequent GET returns the new runs.
+- GET `/api/visibility/measure` (default org `org_acme_demo`) returns 47 runs, aggregate count 47, `persisted: true`, providers: ["mock"].
+- POST `/api/visibility/measure` with brandName+prompt + `x-organization-id` creates a run that appears on subsequent GET (verified live).
+- Dashboard Evidence panel (client-rendered) displays live aggregate ("Evidence and aggregates from 47 run(s) (0 live)") and multiple persisted runs. Mock provider is labeled.
+- Full onboarding wizard E2E previously confirmed; batch measure persists.
 - Health endpoint returns `{"status":"ok","service":"kyzen","version":"0.3.0"}`.
-- Production deployment on Vercel is READY (latest main commits).
+- Production deployment on Vercel is READY.
 - PWA assets present: `/manifest.webmanifest`, `/sw.js`, icons; service worker registration in layout.
 - Dependabot major-version freeze configured in `.github/dependabot.yml`.
 - **CI blocker:** GitHub Actions runs fail with "account is locked due to a billing issue" (ubuntu-latest). Workflows themselves are valid; billing must be resolved on the owner account for green CI. Vercel production deploys continue independently. See docs/CI_WORKAROUNDS.md.
@@ -119,4 +119,4 @@ Record at 1080p; link the video URL in README when uploaded.
 
 ## Seeded live demo note
 
-Public demo org `org_acme_demo` has persisted evaluation runs (including Kyzen-brand prompts). Dashboard Evidence should show them without authentication when the deployment has `DATABASE_URL`. Current dashboard reports 44+ live mock-provider runs persisted in Postgres.
+Public demo org `org_acme_demo` has persisted evaluation runs (including Kyzen-brand prompts). Dashboard Evidence should show them without authentication when the deployment has `DATABASE_URL`. Current dashboard reports 47 live mock-provider runs persisted in Postgres.
