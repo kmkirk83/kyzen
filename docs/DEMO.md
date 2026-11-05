@@ -104,12 +104,11 @@ Screenshots available in agent artifacts for this verification run. HUMAN: attac
 
 Record at 1080p; link the video URL in README when uploaded.
 
-## Latest verification (2026-11-04 06:13 UTC)
+## Latest verification (2026-11-05 06:20 UTC)
 
-- GET `/api/visibility/measure` (default org `org_acme_demo`) returns 47 runs, aggregate count 47, `persisted: true`, providers: ["mock"].
-- POST `/api/visibility/measure` with brandName+prompt + `x-organization-id` creates a run that appears on subsequent GET (verified live).
-- Dashboard Evidence panel (client-rendered) displays live aggregate ("Evidence and aggregates from 47 run(s) (0 live)") and multiple persisted runs. Mock provider is labeled.
-- Full onboarding wizard E2E previously confirmed; batch measure persists.
+- GET `/api/visibility/measure` (default org `org_acme_demo`) returns 47+ runs, aggregate count 47, `persisted: true`, providers: ["mock"].
+- Dashboard Evidence panel (client-rendered) displays live aggregate ("MEASUREMENTS (MOCK PROVIDER) Evidence and aggregates from 47 run(s) (0 live)") and multiple persisted runs. Mock provider is labeled in the Evidence banner.
+- Full onboarding wizard E2E confirmed live: Welcome → Environment (2/6 ready, database+auth Ready, mock noted) → Organization (SaleReadyOrg2026 / saleready2026 persisted) → Measure (brand ExecutorVerify2026 + 2 prompts) → batch POST succeeds, 2 runs created, Ready step shown with "Mode: Persisted".
 - Health endpoint returns `{"status":"ok","service":"kyzen","version":"0.3.0"}`.
 - Production deployment on Vercel is READY.
 - PWA assets present: `/manifest.webmanifest`, `/sw.js`, icons; service worker registration in layout.
@@ -119,4 +118,4 @@ Record at 1080p; link the video URL in README when uploaded.
 
 ## Seeded live demo note
 
-Public demo org `org_acme_demo` has persisted evaluation runs (including Kyzen-brand prompts). Dashboard Evidence should show them without authentication when the deployment has `DATABASE_URL`. Current dashboard reports 47 live mock-provider runs persisted in Postgres.
+Public demo org `org_acme_demo` has persisted evaluation runs (including Kyzen-brand prompts). Dashboard Evidence should show them without authentication when the deployment has `DATABASE_URL`. Current dashboard reports 47+ live mock-provider runs persisted in Postgres.
