@@ -104,18 +104,18 @@ Screenshots available in agent artifacts for this verification run. HUMAN: attac
 
 Record at 1080p; link the video URL in README when uploaded.
 
-## Latest verification (2026-11-05 22:14 UTC / PST equivalent)
+## Latest verification (2026-11-07 06:15 UTC)
 
-- GET `/api/visibility/measure` (default org `org_acme_demo`) returns 49 runs, aggregate count 49, `persisted: true`, providers: ["mock"]. Latest runs include ExecutorVerify2026 batch.
-- Dashboard Evidence panel (client-rendered, verified via headless browser) displays live aggregate ("MEASUREMENTS (MOCK PROVIDER) Evidence and aggregates from 49 run(s) (0 live)") and multiple persisted runs. Mock provider is labeled in the Evidence banner. Static HTML fetch shows placeholder until JS hydrates.
-- Full onboarding wizard E2E previously confirmed live; API persistence continues to hold across requests.
+- POST `/api/visibility/measure` (org `org_acme_demo`, brand TestBrandExecutor) returns a persisted run; subsequent GET returns aggregate count 50 (then 52 after batch), `persisted: true`, providers: ["mock"].
+- POST `/api/visibility/measure/batch` (brand BatchTestExecutor, 2 prompts) succeeds; GET shows both new runs at top of list.
+- Dashboard Evidence panel (client-rendered via headless browser) displays "MEASUREMENTS (MOCK PROVIDER) Evidence and aggregates from 50 run(s) (0 live)" and lists the new TestBrandExecutor run with MOCK badge. Mock provider is clearly labeled.
+- Onboarding wizard at `/onboarding` is live and describes the path to batch measure → dashboard Evidence.
 - Health endpoint returns `{"status":"ok","service":"kyzen","version":"0.3.0"}`.
-- Production deployment on Vercel is READY (site live, API responding).
-- PWA assets present: `/manifest.webmanifest`, `/sw.js`, icons; service worker registration in layout.
+- Production deployment on Vercel is READY (site live, API responding, PWA assets present: manifest.webmanifest, sw.js).
 - Dependabot major-version freeze configured in `.github/dependabot.yml`.
 - **CI blocker:** GitHub Actions runs fail with "account is locked due to a billing issue" (ubuntu-latest). Workflows themselves are valid; billing must be resolved on the owner account for green CI. Vercel production deploys continue independently. See docs/CI_WORKAROUNDS.md.
 - Walkthrough MP4 generation blocked by ffmpeg drawtext filter; docs contain exact click path + 60s script. HUMAN: record 60s from path above.
 
 ## Seeded live demo note
 
-Public demo org `org_acme_demo` has persisted evaluation runs (including Kyzen-brand prompts and recent verification brands). Dashboard Evidence shows them without authentication when the deployment has `DATABASE_URL`. Current dashboard reports 49 live mock-provider runs persisted in Postgres.
+Public demo org `org_acme_demo` has persisted evaluation runs (including Kyzen-brand prompts and recent verification brands such as TestBrandExecutor / BatchTestExecutor). Dashboard Evidence shows them without authentication when the deployment has `DATABASE_URL`. Current dashboard reports 50+ live mock-provider runs persisted in Postgres.
