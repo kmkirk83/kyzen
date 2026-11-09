@@ -104,31 +104,15 @@ Screenshots available in agent artifacts for this verification run. HUMAN: attac
 
 Record at 1080p; link the video URL in README when uploaded.
 
-## Latest verification (2026-11-07 06:15 UTC)
+## Latest verification (2026-11-09 06:15 UTC)
 
-- POST `/api/visibility/measure` (org `org_acme_demo`, brand TestBrandExecutor) returns a persisted run; subsequent GET returns aggregate count 50 (then 52 after batch), `persisted: true`, providers: ["mock"].
-- POST `/api/visibility/measure/batch` (brand BatchTestExecutor, 2 prompts) succeeds; GET shows both new runs at top of list.
-- Dashboard Evidence panel (client-rendered via headless browser) displays "MEASUREMENTS (MOCK PROVIDER) Evidence and aggregates from 50 run(s) (0 live)" and lists the new TestBrandExecutor run with MOCK badge. Mock provider is clearly labeled.
-- Onboarding wizard at `/onboarding` is live and describes the path to batch measure → dashboard Evidence.
-- Health endpoint returns `{"status":"ok","service":"kyzen","version":"0.3.0"}`.
-- Production deployment on Vercel is READY (site live, API responding, PWA assets present: manifest.webmanifest, sw.js).
-- Dependabot major-version freeze configured in `.github/dependabot.yml`.
-- **CI blocker:** GitHub Actions runs fail with "account is locked due to a billing issue" (ubuntu-latest). Workflows themselves are valid; billing must be resolved on the owner account for green CI. Vercel production deploys continue independently. See docs/CI_WORKAROUNDS.md.
-- Walkthrough MP4 generation blocked by ffmpeg drawtext filter; docs contain exact click path + 60s script. HUMAN: record 60s from path above.
-
-## Seeded live demo note
-
-Public demo org `org_acme_demo` has persisted evaluation runs (including Kyzen-brand prompts and recent verification brands such as TestBrandExecutor / BatchTestExecutor). Dashboard Evidence shows them without authentication when the deployment has `DATABASE_URL`. Current dashboard reports 50+ live mock-provider runs persisted in Postgres.
-## Latest verification (2026-11-08 06:15 UTC)
-
-- Live measure→Neon persist confirmed: POST `/api/visibility/measure` with custom `x-organization-id` returns run; subsequent GET with same header returns the run (`persisted: true`, organizationId matches).
-- Default public org `org_acme_demo` currently holds 52 persisted mock-provider runs. Dashboard Evidence panel (headless browser client render) displays “Measurements (mock provider) Evidence and aggregates from 52 run(s) (0 live) stored for this workspace” and lists runs.
-- Mock provider is labeled in UI banner, Evidence cards (“mock” badge), and API responses (`response.provider: "mock"`).
-- Onboarding wizard at `/onboarding` is reachable and describes the Welcome → Environment → Organization → Measure → Ready path that writes to Evidence.
-- Production Vercel deployment READY on latest main (dpl_6fnA811rtEfynHubjrvAQLL5tMvE). PWA assets (`manifest.webmanifest`, `sw.js`, icons) present and serving.
-- Dependabot major-version freeze remains configured.
+- Live measure→Neon persist confirmed: GET `/api/visibility/measure` (default org `org_acme_demo`) returns aggregate count 52, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel displays the same.
+- Mock provider is labeled in UI banner, Evidence cards, and API responses.
+- Onboarding wizard at `/onboarding` is reachable.
+- Production Vercel deployment READY. PWA assets present.
+- Dependabot major-version freeze configured.
 - **CI blocker remains:** GitHub Actions fail with account locked due to billing issue. Vercel deploys independent.
-- Walkthrough MP4 generation still blocked by missing ffmpeg `drawtext` filter in this environment. Exact click path and 60s script remain in this file. HUMAN: record 60s.
+- Walkthrough MP4 generation still blocked by missing ffmpeg `drawtext` filter in this environment. Exact click path and 60s script remain in this file. HUMAN: record 60s from path above.
 
 ## Seeded live demo note
 
