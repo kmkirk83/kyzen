@@ -91,7 +91,7 @@ Readiness endpoint (`GET /api/readiness`) already surfaces whether any AI provid
 - `/dashboard` (dashboard.png)
 - `/onboarding` (onboarding.png)
 
-Screenshots available in agent artifacts for this verification run. HUMAN: attach these or higher-res captures / voiceover to listing / Loom. MP4 generation blocked by missing ffmpeg drawtext filter; use screenshots or record 60s.
+Screenshots + ~26s slideshow MP4 (kyzen-buyer-walkthrough.mp4) produced in agent artifacts this run (no drawtext; pure image sequence). HUMAN: optionally add voiceover or upload to Loom; attach stills to listing.
 
 ## 60-second script (HUMAN: record 60s)
 
@@ -104,7 +104,7 @@ Screenshots available in agent artifacts for this verification run. HUMAN: attac
 
 Record at 1080p; link the video URL in README when uploaded.
 
-## Latest verification (2026-11-09 06:15 UTC)
+## Latest verification (2026-11-09 22:15 PST / 06:15 UTC)
 
 - Live measure→Neon persist confirmed: GET `/api/visibility/measure` (default org `org_acme_demo`) returns aggregate count 52, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel displays the same.
 - Mock provider is labeled in UI banner, Evidence cards, and API responses.
@@ -112,7 +112,7 @@ Record at 1080p; link the video URL in README when uploaded.
 - Production Vercel deployment READY. PWA assets present.
 - Dependabot major-version freeze configured.
 - **CI blocker remains:** GitHub Actions fail with account locked due to billing issue. Vercel deploys independent.
-- Walkthrough MP4 generation still blocked by missing ffmpeg `drawtext` filter in this environment. Exact click path and 60s script remain in this file. HUMAN: record 60s from path above.
+- Walkthrough assets advanced: headless screenshots + slideshow MP4 generated (drawtext unavailable; image sequence used). Exact click path and 60s script remain in this file. HUMAN: optional voiceover / Loom upload.
 
 ## Seeded live demo note
 
