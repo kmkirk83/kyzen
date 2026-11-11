@@ -104,16 +104,16 @@ Screenshots + ~26s slideshow MP4 (kyzen-buyer-walkthrough.mp4) produced in agent
 
 Record at 1080p; link the video URL in README when uploaded.
 
-## Latest verification (2026-11-09 22:15 PST / 06:15 UTC)
+## Latest verification (2026-11-11 06:15 UTC)
 
-- Live measure→Neon persist confirmed: GET `/api/visibility/measure` (default org `org_acme_demo`) returns aggregate count 52, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel displays the same.
+- Live measure→Neon persist confirmed: GET `/api/visibility/measure` (default org `org_acme_demo`) returns aggregate count 54, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel displays the same (mock labeled).
 - Mock provider is labeled in UI banner, Evidence cards, and API responses.
-- Onboarding wizard at `/onboarding` is reachable.
-- Production Vercel deployment READY. PWA assets present.
+- Onboarding wizard at `/onboarding` is reachable and functional for batch measure.
+- Production Vercel deployment READY on latest main (dpl_DUaZ1AsrSrfF6QXGpX1Nm7BFXCt2). PWA assets present.
 - Dependabot major-version freeze configured.
 - **CI blocker remains:** GitHub Actions fail with account locked due to billing issue. Vercel deploys independent.
 - Walkthrough assets advanced: headless screenshots + slideshow MP4 generated (drawtext unavailable; image sequence used). Exact click path and 60s script remain in this file. HUMAN: optional voiceover / Loom upload.
 
 ## Seeded live demo note
 
-Public demo org `org_acme_demo` has 52+ persisted evaluation runs. Dashboard Evidence shows them without authentication. Sample/Seeded modes remain independent of the live Evidence panel.
+Public demo org `org_acme_demo` has 54+ persisted evaluation runs. Dashboard Evidence shows them without authentication. Sample/Seeded modes remain independent of the live Evidence panel.
