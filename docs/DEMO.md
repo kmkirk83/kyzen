@@ -104,16 +104,16 @@ Screenshots + ~26s slideshow MP4 (kyzen-buyer-walkthrough.mp4) produced in agent
 
 Record at 1080p; link the video URL in README when uploaded.
 
-## Latest verification (2026-11-12 06:15 UTC)
+## Latest verification (2026-11-13 06:15 UTC)
 
-- Live measure→Neon persist confirmed: GET `/api/visibility/measure` (default org `org_acme_demo`) returns aggregate count 56, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel displays the same (mock labeled) after client hydration.
+- Live measure→Neon persist confirmed this run: POST `/api/visibility/measure` (org `org_acme_demo`, brandName+prompt) returned 201; subsequent GET returned aggregate count 57, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel displays the same (mock labeled) after client hydration.
 - Mock provider is labeled in UI banner, Evidence cards, and API responses.
 - Onboarding wizard at `/onboarding` is reachable and functional (environment check shows database + auth Ready; mock fallback explicit).
-- Production Vercel deployment READY on latest main. PWA assets present.
-- Dependabot major-version freeze configured.
+- Production Vercel deployment READY on latest main. PWA assets present (manifest.webmanifest, sw.js, icons).
+- Dependabot major-version freeze configured in .github/dependabot.yml.
 - **CI blocker remains:** GitHub Actions fail with account locked due to billing issue. Vercel deploys independent.
 - Walkthrough assets advanced: headless screenshots + slideshow MP4 generated (drawtext unavailable; image sequence used). Exact click path and 60s script remain in this file. HUMAN: optional voiceover / Loom upload.
 
 ## Seeded live demo note
 
-Public demo org `org_acme_demo` has 56+ persisted evaluation runs. Dashboard Evidence shows them without authentication. Sample/Seeded modes remain independent of the live Evidence panel.
+Public demo org `org_acme_demo` has 57+ persisted evaluation runs. Dashboard Evidence shows them without authentication. Sample/Seeded modes remain independent of the live Evidence panel.
