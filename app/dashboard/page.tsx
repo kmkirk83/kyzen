@@ -1,6 +1,539 @@
-use client;
+"use client";
 
-// TEMP - will replace with full file in next commit
+import Link from "next/link";
+import { useEffect, useId, useMemo, useState } from "react";
+
+import {
+  buildVisibilitySummary,
+  type DataMode,
+  type Improvement,
+} from "@/lib/visibility-summary";
+import { SAMPLE_ENGINE_RANKS } from "@/lib/geo-rank";
+import { GeoRankSection } from "@/packages/geo-rank-tracking/components/GeoRankSection";
+
+const CATEGORY_INFO = {
+  visibility: {
+    title: "Visibility score",
+    body: "A single 0–100 headline for how present and well-regarded your brand is across AI answer surfaces. Weighted: coverage 40%, trust 40%, sentiment 20%.",
+  },
+  coverage: {
+    title: "Coverage",
+    body: "How often your brand appears in AI-generated answers for relevant queries.",
+  },
+  trust: {
+    title: "Trust",
+    body: "How strongly and cleanly you are cited when you appear.",
+  },
+  sentiment: {
+    title: "Sentiment",
+    body: "The tone of mentions about your brand in AI answers.",
+  },
+  answer_engines: {
+    title: "Answer engines",
+    body: "AI systems that return direct answers (overview-style answer boxes).",
+  },
+  assistants: {
+    title: "Assistants",
+    body: "Conversational AI assistants where users ask follow-up questions.",
+  },
+  search_overviews: {
+    title: "Search overviews",
+    body: "AI-generated overviews embedded in search results.",
+  },
+} as const;
+
+type InfoKey = keyof typeof CATEGORY_INFO;
+const CHECKLIST_KEY = "kyzen-improvement-checklist";
+const MODE_KEY = "kyzen-data-mode";
+
+function scoreTone(n: number) {
+  if (n >= 70) return "good";
+  if (n >= 45) return "mid";
+  return "low";
+}
+
+function InfoTip({ infoKey }: { infoKey: InfoKey }) {
+  const tip = CATEGORY_INFO[infoKey];
+  const panelId = useId();
+  const [open, setOpen] = useState(false);
+  return (
+    <span className={`infoWrap ${open ? "open" : ""}`}>
+      <button
+        type="button"
+        className="infoDot"
+        aria-label={`About ${tip.title}`}
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setOpen((v) => !v);
+        }}
+        onBlur={() => setOpen(false)}
+      >
+        i
+      </button>
+      <span id={panelId} role="tooltip" className="infoPanel">
+        <strong>{tip.title}</strong>
+        <span>{tip.body}</span>
+      </span>
+    </span>
+  );
+}
+
+function LabelWithInfo({
+  children,
+  infoKey,
+}: {
+  children: React.ReactNode;
+  infoKey: InfoKey;
+}) {
+  return (
+    <span className="labelWithInfo">
+      <span>{children}</span>
+      <InfoTip infoKey={infoKey} />
+    </span>
+  );
+}
+
+type EvidenceRun = {
+  id: string;
+  prompt: string;
+  brandName: string;
+  scores: { overall: number; coverage?: number; trust?: number; sentiment?: number };
+  response: {
+    measuredAt: string;
+    citations: Array<{ title: string; url?: string }>;
+    provider?: string;
+    model?: string;
+    rawText?: string;
+  };
+  evidence?: {
+    mentioned: boolean;
+    mentionCount: number;
+    firstMentionOffset: number | null;
+    isLive: boolean;
+  };
+  engineRanks?: typeof SAMPLE_ENGINE_RANKS;
+};
+
 export default function DashboardPage() {
-  return <div>Loading fixed dashboard…</div>;
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [mode, setMode] = useState<DataMode>("sample");
+  const [done, setDone] = useState<Record<string, boolean>>({});
+
+  const [evidence, setEvidence] = useState<EvidenceRun[]>([]);
+  const [liveAgg, setLiveAgg] = useState<{
+    overall: number;
+    count: number;
+    liveCount?: number;
+    persisted?: boolean;
+    providers?: string[];
+  } | null>(null);
+  const [evidenceLoading, setEvidenceLoading] = useState(true);
+
+  useEffect(() => {
+    try {
+      const m = localStorage.getItem(MODE_KEY) as DataMode | null;
+      if (m === "sample" || m === "seeded") setMode(m);
+      const raw = localStorage.getItem(CHECKLIST_KEY);
+      if (raw) setDone(JSON.parse(raw) as Record<string, boolean>);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    setEvidenceLoading(true);
+    fetch("/api/visibility/measure")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data.runs)) setEvidence(data.runs.slice(0, 12));
+        if (data.aggregate) setLiveAgg(data.aggregate);
+      })
+      .catch(() => {})
+      .finally(() => setEvidenceLoading(false));
+  }, []);
+
+  const summary = useMemo(
+    () => buildVisibilitySummary("2026-10-22T00:00:00.000Z", mode),
+    [mode],
+  );
+
+  function setModePersist(next: DataMode) {
+    setMode(next);
+    try {
+      localStorage.setItem(MODE_KEY, next);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function toggleDone(item: Improvement) {
+    setDone((prev) => {
+      const next = { ...prev, [item.id]: !prev[item.id] };
+      try {
+        localStorage.setItem(CHECKLIST_KEY, JSON.stringify(next));
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  }
+
+  const completedCount = summary.improvements.filter((i) => done[i.id]).length;
+
+  const hasLive = Boolean(liveAgg?.liveCount && liveAgg.liveCount > 0);
+  const providers = liveAgg?.providers ?? [];
+  const providerLabel = hasLive
+    ? ` (live: ${providers.filter((p) => p !== "mock").join(", ") || "provider"})`
+    : providers.includes("mock")
+      ? " (mock provider)"
+      : "";
+
+  // Prefer live engine ranks from the latest run; fall back to sample for demo.
+  const engineRanks =
+    evidence.find((r) => r.engineRanks && r.engineRanks.length > 0)?.engineRanks ??
+    SAMPLE_ENGINE_RANKS;
+
+  return (
+    <div className="dashRoot">
+      <header className="dashTop">
+        <div className="dashBrand">
+          <span className="dashLogo">kyzen</span>
+          <span className="dashMeta">
+            {summary.organization} · {summary.brand}
+          </span>
+        </div>
+        <div className="dashTopActions">
+          <div className="modeToggle" role="group" aria-label="Data mode">
+            <button
+              type="button"
+              className={mode === "sample" ? "active" : ""}
+              onClick={() => setModePersist("sample")}
+            >
+              Sample
+            </button>
+            <button
+              type="button"
+              className={mode === "seeded" ? "active" : ""}
+              onClick={() => setModePersist("seeded")}
+            >
+              Seeded
+            </button>
+          </div>
+          <button
+            type="button"
+            className="hamburger"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
+      </header>
+
+      <div
+        className={`menuOverlay ${menuOpen ? "open" : ""}`}
+        onClick={() => setMenuOpen(false)}
+        aria-hidden={!menuOpen}
+      />
+      <aside className={`sideMenu ${menuOpen ? "open" : ""}`} aria-hidden={!menuOpen}>
+        <div className="sideMenuHead">
+          <strong>Menu</strong>
+          <button type="button" className="sideClose" aria-label="Close" onClick={() => setMenuOpen(false)}>
+            ×
+          </button>
+        </div>
+        <nav className="sideNav">
+          <Link href="/" onClick={() => setMenuOpen(false)}>
+            Home
+          </Link>
+          <Link href="/start" onClick={() => setMenuOpen(false)}>
+            Product tour
+          </Link>
+          <Link href="/dashboard" onClick={() => setMenuOpen(false)}>
+            Dashboard
+          </Link>
+          <Link href="/onboarding" onClick={() => setMenuOpen(false)}>
+            Onboarding
+          </Link>
+        </nav>
+        <p className="sideNote">Sample catalog · evaluation mode</p>
+      </aside>
+
+      <main className="dashMain">
+        <div
+          className={`modeBanner ${liveAgg && liveAgg.count > 0 ? "modeBanner-live" : "modeBanner-sample"}`}
+        >
+          {liveAgg && liveAgg.count > 0 ? (
+            <>
+              <strong>
+                {hasLive ? "Live measurements" : "Measurements"}
+                {providerLabel}
+              </strong>
+              <span>
+                Evidence and aggregates from {liveAgg.count} run(s)
+                {typeof liveAgg.liveCount === "number"
+                  ? ` (${liveAgg.liveCount} live)`
+                  : ""}
+                {liveAgg.persisted ? " stored for this workspace" : " in session memory"}. Score cards
+                above can still use Sample or Seeded catalogs for comparison.
+              </span>
+            </>
+          ) : (
+            <>
+              <strong>Catalog scores</strong>
+              <span>
+                Score cards use the Sample or Seeded catalog. Run{" "}
+                <a href="/onboarding">onboarding</a> or a measure API call to populate live Evidence.
+              </span>
+            </>
+          )}
+        </div>
+
+        <section className="plane plane-raised scoreHero">
+          <div className="scoreHeroLeft">
+            <p className="chip">
+              <LabelWithInfo infoKey="visibility">Visibility score</LabelWithInfo>
+            </p>
+            <h1 className={`bigScore tone-${scoreTone(summary.overallScore)}`}>{summary.overallScore}</h1>
+            <p className="scoreSub">
+              Weighted from coverage, trust, and sentiment. Mode: <strong>{summary.source}</strong>.
+              Trend: <strong>{summary.trend}</strong>
+            </p>
+          </div>
+          <div className="pillarRow">
+            {(
+              [
+                ["Coverage", summary.pillars.coverage, "coverage"] as const,
+                ["Trust", summary.pillars.trust, "trust"] as const,
+                ["Sentiment", summary.pillars.sentiment, "sentiment"] as const,
+              ] as const
+            ).map(([label, value, key]) => (
+              <div key={key} className="pillarCard">
+                <span className="pillarLabel">
+                  <LabelWithInfo infoKey={key}>{label}</LabelWithInfo>
+                </span>
+                <span className={`pillarValue tone-${scoreTone(value)}`}>{value}</span>
+                <div className="barTrack">
+                  <div className={`barFill tone-${scoreTone(value)}`} style={{ width: `${value}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="surfaceSection">
+          <h2>By surface</h2>
+          <div className="surfaceGrid">
+            {summary.surfaces.map((s) => {
+              const weakest = Math.min(...summary.surfaces.map((x) => x.score));
+              const strongest = Math.max(...summary.surfaces.map((x) => x.score));
+              const priorityClass =
+                s.score === weakest && weakest < strongest
+                  ? "priority-weak"
+                  : s.score === strongest
+                    ? "priority-strong"
+                    : "";
+              return (
+                <article
+                  key={s.key}
+                  id={`surface-${s.key}`}
+                  className={`surfaceCard ${priorityClass}`.trim()}
+                >
+                  <header>
+                    <h3>
+                      <LabelWithInfo infoKey={s.key}>{s.label}</LabelWithInfo>
+                    </h3>
+                    <span className={`surfaceScore tone-${scoreTone(s.score)}`}>{s.score}</span>
+                  </header>
+                  <ul className="metricList">
+                    <li>
+                      <span>
+                        <LabelWithInfo infoKey="coverage">Coverage</LabelWithInfo>
+                      </span>
+                      <strong>{s.coverage}</strong>
+                    </li>
+                    <li>
+                      <span>
+                        <LabelWithInfo infoKey="trust">Trust</LabelWithInfo>
+                      </span>
+                      <strong>{s.trust}</strong>
+                    </li>
+                    <li>
+                      <span>
+                        <LabelWithInfo infoKey="sentiment">Sentiment</LabelWithInfo>
+                      </span>
+                      <strong>{s.sentiment}</strong>
+                    </li>
+                  </ul>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="improveSection plane" aria-labelledby="improve-heading">
+          <div className="improveHead">
+            <h2 id="improve-heading">Recommended improvements</h2>
+            <p className="improveLede">
+              Ranked from the scores above. Mark items done to track progress ({completedCount} /{" "}
+              {summary.improvements.length} complete).
+            </p>
+          </div>
+          <ul className="improveList">
+            {summary.improvements.map((item) => {
+              const isDone = Boolean(done[item.id]);
+              return (
+                <li
+                  key={item.id}
+                  className={`improveCard priority-${item.priority} ${isDone ? "isDone" : ""}`}
+                >
+                  <div className="improveTop">
+                    <span className={`priorityPill priority-${item.priority}`}>{item.priority}</span>
+                    <span className="impactTag">{item.impact}</span>
+                  </div>
+                  <h3>{item.title}</h3>
+                  <p className="improveWhy">{item.why}</p>
+                  <div className="improveActions">
+                    <button
+                      type="button"
+                      className={`checkBtn ${isDone ? "checked" : ""}`}
+                      aria-pressed={isDone}
+                      onClick={() => toggleDone(item)}
+                    >
+                      {isDone ? "Done" : "Mark done"}
+                    </button>
+                    <a
+                      className="improveCta"
+                      href={item.href}
+                      {...(item.href.startsWith("http")
+                        ? { target: "_blank", rel: "noopener noreferrer" }
+                        : {})}
+                    >
+                      {item.cta}
+                      <span aria-hidden="true">→</span>
+                    </a>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+
+        <section className="improveSection plane" aria-labelledby="evidence-heading">
+          <div className="improveHead">
+            <h2 id="evidence-heading">Evidence{providerLabel}</h2>
+            <p className="improveLede">
+              {liveAgg
+                ? `Aggregate ${liveAgg.overall} from ${liveAgg.count} run(s)${
+                    typeof liveAgg.liveCount === "number" ? ` · ${liveAgg.liveCount} live` : ""
+                  }${liveAgg.persisted ? " (persisted)" : " (session)"}${providerLabel}.`
+                : "No measurements yet. Complete onboarding or POST /api/visibility/measure."}
+            </p>
+          </div>
+          {evidenceLoading ? (
+            <div className="evidenceSkeleton" aria-busy="true" aria-label="Loading evidence">
+              <div className="skeletonCard" />
+              <div className="skeletonCard" />
+              <div className="skeletonCard" />
+            </div>
+          ) : evidence.length > 0 ? (
+            <ul className="evidenceList">
+              {evidence.map((run) => {
+                const isLive = run.evidence?.isLive ?? run.response.provider !== "mock";
+                const mentioned = run.evidence?.mentioned;
+                const mentionCount = run.evidence?.mentionCount;
+                const overall = run.scores.overall;
+                const scoreClass =
+                  overall >= 70 ? "score-high" : overall >= 50 ? "score-mid" : "score-low";
+                return (
+                  <li key={run.id} className={`evidenceCard ${scoreClass}`}>
+                    <div className="evidenceCardHead">
+                      <div>
+                        <div className="evidenceBrand">{run.brandName}</div>
+                        <div className="evidenceMeta" style={{ marginTop: "0.35rem" }}>
+                          <span
+                            className={`evidenceChip ${isLive ? "" : "mock"}`}
+                            title={isLive ? "Live provider response" : "Mock / demo response"}
+                          >
+                            {isLive ? "live" : "mock"}
+                          </span>
+                        </div>
+                      </div>
+                      <span className={`evidenceScore tone-${scoreTone(overall)}`}>{overall}</span>
+                    </div>
+                    <p className="evidencePrompt">{run.prompt}</p>
+                    {run.response.rawText && (
+                      <p className="evidenceExcerpt">
+                        {run.response.rawText.slice(0, 160)}
+                        {run.response.rawText.length > 160 ? "…" : ""}
+                      </p>
+                    )}
+                    <div className="evidenceFoot">
+                      <span>{run.response.measuredAt?.slice(0, 19).replace("T", " ")}</span>
+                      {run.response.provider && (
+                        <span>
+                          {run.response.provider}
+                          {run.response.model ? ` / ${run.response.model}` : ""}
+                        </span>
+                      )}
+                      {run.response.citations?.length ? (
+                        <span>{run.response.citations.length} citation(s)</span>
+                      ) : null}
+                      {typeof mentioned === "boolean" && (
+                        <span>
+                          {mentioned
+                            ? `mentioned${typeof mentionCount === "number" ? ` ×${mentionCount}` : ""}`
+                            : "not mentioned"}
+                        </span>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <div className="emptyEvidence">
+              <p className="improveWhy">
+                No live measurement runs yet. Catalog scores above are for evaluation only.
+              </p>
+              <div className="heroActions">
+                <a className="btnPrimary" href="/onboarding">
+                  Start setup wizard
+                </a>
+                <a className="btnGhost" href="/start">
+                  Product tour
+                </a>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-6">
+            <GeoRankSection ranks={engineRanks} isLoading={evidenceLoading} trackGeoRanksEnabled={true} />
+          </div>
+        </section>
+
+        <section className="howSection">
+          <h2>How scoring works</h2>
+          <p>
+            Each surface scores <code>coverage × 40% + trust × 40% + sentiment × 20%</code>. Sample and
+            Seeded modes provide comparable catalogs; live Evidence comes from the measure API. Engine
+            Rankings show mention and citation position across major AI models when GEO tracking is
+            enabled. Structured evidence (mentioned, mentionCount, isLive) is attached to every
+            measurement run.
+          </p>
+          <ul>
+            {summary.notes.map((n) => (
+              <li key={n}>{n}</li>
+            ))}
+          </ul>
+        </section>
+      </main>
+    </div>
+  );
 }
