@@ -153,14 +153,7 @@ export default function DashboardPage() {
       })
       .catch(() => {})
       .finally(() => setEvidenceLoading(false));
-  }, [mode]);
-
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [menuOpen]);
+  }, []);
 
   const summary = useMemo(
     () => buildVisibilitySummary("2026-10-22T00:00:00.000Z", mode),
@@ -248,11 +241,10 @@ export default function DashboardPage() {
         onClick={() => setMenuOpen(false)}
         aria-hidden={!menuOpen}
       />
-
       <aside className={`sideMenu ${menuOpen ? "open" : ""}`} aria-hidden={!menuOpen}>
         <div className="sideMenuHead">
           <strong>Menu</strong>
-          <button type="button" className="sideClose" onClick={() => setMenuOpen(false)} aria-label="Close">
+          <button type="button" className="sideClose" aria-label="Close" onClick={() => setMenuOpen(false)}>
             ×
           </button>
         </div>
@@ -270,15 +262,12 @@ export default function DashboardPage() {
             Onboarding
           </Link>
         </nav>
-        <p className="sideNote">
-          {mode === "seeded" ? "Seeded snapshot" : "Sample catalog"}
-        </p>
+        <p className="sideNote">Sample catalog · evaluation mode</p>
       </aside>
 
       <main className="dashMain">
         <div
           className={`modeBanner ${liveAgg && liveAgg.count > 0 ? "modeBanner-live" : "modeBanner-sample"}`}
-          role="status"
         >
           {liveAgg && liveAgg.count > 0 ? (
             <>
@@ -305,6 +294,7 @@ export default function DashboardPage() {
             </>
           )}
         </div>
+
         <section className="plane plane-raised scoreHero">
           <div className="scoreHeroLeft">
             <p className="chip">
@@ -317,11 +307,13 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="pillarRow">
-            {([
-              ["Coverage", summary.pillars.coverage, "coverage"] as const,
-              ["Trust", summary.pillars.trust, "trust"] as const,
-              ["Sentiment", summary.pillars.sentiment, "sentiment"] as const,
-            ]).map(([label, value, key]) => (
+            {(
+              [
+                ["Coverage", summary.pillars.coverage, "coverage"] as const,
+                ["Trust", summary.pillars.trust, "trust"] as const,
+                ["Sentiment", summary.pillars.sentiment, "sentiment"] as const,
+              ] as const
+            ).map(([label, value, key]) => (
               <div key={key} className="pillarCard">
                 <span className="pillarLabel">
                   <LabelWithInfo infoKey={key}>{label}</LabelWithInfo>
@@ -338,36 +330,50 @@ export default function DashboardPage() {
         <section className="surfaceSection">
           <h2>By surface</h2>
           <div className="surfaceGrid">
-            {summary.surfaces.map((s) => (
-              <article key={s.key} id={`surface-${s.key}`} className="surfaceCard">
-                <header>
-                  <h3>
-                    <LabelWithInfo infoKey={s.key}>{s.label}</LabelWithInfo>
-                  </h3>
-                  <span className={`surfaceScore tone-${scoreTone(s.score)}`}>{s.score}</span>
-                </header>
-                <ul className="metricList">
-                  <li>
-                    <span>
-                      <LabelWithInfo infoKey="coverage">Coverage</LabelWithInfo>
-                    </span>
-                    <strong>{s.coverage}</strong>
-                  </li>
-                  <li>
-                    <span>
-                      <LabelWithInfo infoKey="trust">Trust</LabelWithInfo>
-                    </span>
-                    <strong>{s.trust}</strong>
-                  </li>
-                  <li>
-                    <span>
-                      <LabelWithInfo infoKey="sentiment">Sentiment</LabelWithInfo>
-                    </span>
-                    <strong>{s.sentiment}</strong>
-                  </li>
-                </ul>
-              </article>
-            ))}
+            {summary.surfaces.map((s) => {
+              const weakest = Math.min(...summary.surfaces.map((x) => x.score));
+              const strongest = Math.max(...summary.surfaces.map((x) => x.score));
+              const priorityClass =
+                s.score === weakest && weakest < strongest
+                  ? "priority-weak"
+                  : s.score === strongest
+                    ? "priority-strong"
+                    : "";
+              return (
+                <article
+                  key={s.key}
+                  id={`surface-${s.key}`}
+                  className={`surfaceCard ${priorityClass}`.trim()}
+                >
+                  <header>
+                    <h3>
+                      <LabelWithInfo infoKey={s.key}>{s.label}</LabelWithInfo>
+                    </h3>
+                    <span className={`surfaceScore tone-${scoreTone(s.score)}`}>{s.score}</span>
+                  </header>
+                  <ul className="metricList">
+                    <li>
+                      <span>
+                        <LabelWithInfo infoKey="coverage">Coverage</LabelWithInfo>
+                      </span>
+                      <strong>{s.coverage}</strong>
+                    </li>
+                    <li>
+                      <span>
+                        <LabelWithInfo infoKey="trust">Trust</LabelWithInfo>
+                      </span>
+                      <strong>{s.trust}</strong>
+                    </li>
+                    <li>
+                      <span>
+                        <LabelWithInfo infoKey="sentiment">Sentiment</LabelWithInfo>
+                      </span>
+                      <strong>{s.sentiment}</strong>
+                    </li>
+                  </ul>
+                </article>
+              );
+            })}
           </div>
         </section>
 
@@ -375,7 +381,7 @@ export default function DashboardPage() {
           <div className="improveHead">
             <h2 id="improve-heading">Recommended improvements</h2>
             <p className="improveLede">
-              Ranked from the scores above. Mark items done to track progress ({completedCount}/
+              Ranked from the scores above. Mark items done to track progress ({completedCount} /{" "}
               {summary.improvements.length} complete).
             </p>
           </div>
@@ -437,45 +443,56 @@ export default function DashboardPage() {
               <div className="skeletonCard" />
             </div>
           ) : evidence.length > 0 ? (
-            <ul className="improveList">
+            <ul className="evidenceList">
               {evidence.map((run) => {
                 const isLive = run.evidence?.isLive ?? run.response.provider !== "mock";
                 const mentioned = run.evidence?.mentioned;
                 const mentionCount = run.evidence?.mentionCount;
+                const overall = run.scores.overall;
+                const scoreClass =
+                  overall >= 70 ? "score-high" : overall >= 50 ? "score-mid" : "score-low";
                 return (
-                  <li key={run.id} className="improveCard">
-                    <div className="improveTop">
-                      <span className="impactTag">{run.brandName}</span>
-                      <span
-                        className={`priorityPill ${isLive ? "priority-high" : "priority-low"}`}
-                        title={isLive ? "Live provider response" : "Mock / demo response"}
-                      >
-                        {isLive ? "live" : "mock"}
-                      </span>
-                      <span className={`surfaceScore tone-${scoreTone(run.scores.overall)}`}>
-                        {run.scores.overall}
-                      </span>
+                  <li key={run.id} className={`evidenceCard ${scoreClass}`}>
+                    <div className="evidenceCardHead">
+                      <div>
+                        <div className="evidenceBrand">{run.brandName}</div>
+                        <div className="evidenceMeta" style={{ marginTop: "0.35rem" }}>
+                          <span
+                            className={`evidenceChip ${isLive ? "" : "mock"}`}
+                            title={isLive ? "Live provider response" : "Mock / demo response"}
+                          >
+                            {isLive ? "live" : "mock"}
+                          </span>
+                        </div>
+                      </div>
+                      <span className={`evidenceScore tone-${scoreTone(overall)}`}>{overall}</span>
                     </div>
-                    <h3>{run.prompt}</h3>
-                    <p className="improveWhy">
-                      {run.response.measuredAt?.slice(0, 19).replace("T", " ")}
-                      {run.response.provider ? ` · ${run.response.provider}` : ""}
-                      {run.response.model ? ` / ${run.response.model}` : ""}
-                      {run.response.citations?.length
-                        ? ` · ${run.response.citations.length} citation(s)`
-                        : ""}
-                      {typeof mentioned === "boolean"
-                        ? mentioned
-                          ? ` · mentioned${typeof mentionCount === "number" ? ` ×${mentionCount}` : ""}`
-                          : " · not mentioned"
-                        : ""}
-                    </p>
+                    <p className="evidencePrompt">{run.prompt}</p>
                     {run.response.rawText && (
-                      <p className="improveWhy" style={{ marginTop: "0.35rem", opacity: 0.85 }}>
-                        {run.response.rawText.slice(0, 180)}
-                        {run.response.rawText.length > 180 ? "…" : ""}
+                      <p className="evidenceExcerpt">
+                        {run.response.rawText.slice(0, 160)}
+                        {run.response.rawText.length > 160 ? "…" : ""}
                       </p>
                     )}
+                    <div className="evidenceFoot">
+                      <span>{run.response.measuredAt?.slice(0, 19).replace("T", " ")}</span>
+                      {run.response.provider && (
+                        <span>
+                          {run.response.provider}
+                          {run.response.model ? ` / ${run.response.model}` : ""}
+                        </span>
+                      )}
+                      {run.response.citations?.length ? (
+                        <span>{run.response.citations.length} citation(s)</span>
+                      ) : null}
+                      {typeof mentioned === "boolean" && (
+                        <span>
+                          {mentioned
+                            ? `mentioned${typeof mentionCount === "number" ? ` ×${mentionCount}` : ""}`
+                            : "not mentioned"}
+                        </span>
+                      )}
+                    </div>
                   </li>
                 );
               })}
@@ -496,23 +513,19 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* GEO Rank Tracking — per-engine mention/citation ranks */}
           <div className="mt-6">
-            <GeoRankSection
-              ranks={engineRanks}
-              isLoading={evidenceLoading}
-              trackGeoRanksEnabled={true}
-            />
+            <GeoRankSection ranks={engineRanks} isLoading={evidenceLoading} trackGeoRanksEnabled={true} />
           </div>
         </section>
 
         <section className="howSection">
           <h2>How scoring works</h2>
           <p>
-            Each surface scores <code>coverage × 40% + trust × 40% + sentiment × 20%</code>.
-            Sample and Seeded modes provide comparable catalogs; live Evidence comes from the measure API.
-            Engine Rankings show mention and citation position across major AI models when GEO tracking is enabled.
-            Structured evidence (mentioned, mentionCount, isLive) is attached to every measurement run.
+            Each surface scores <code>coverage × 40% + trust × 40% + sentiment × 20%</code>. Sample and
+            Seeded modes provide comparable catalogs; live Evidence comes from the measure API. Engine
+            Rankings show mention and citation position across major AI models when GEO tracking is
+            enabled. Structured evidence (mentioned, mentionCount, isLive) is attached to every
+            measurement run.
           </p>
           <ul>
             {summary.notes.map((n) => (
