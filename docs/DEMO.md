@@ -104,16 +104,16 @@ Screenshots + ~26s slideshow MP4 (kyzen-buyer-walkthrough.mp4) produced in agent
 
 Record at 1080p; link the video URL in README when uploaded.
 
-## Latest verification (2026-11-14 06:15 UTC)
+## Latest verification (2026-11-15 06:16 UTC)
 
-- Live measure→Neon persist confirmed this run: GET `/api/visibility/measure` (org `org_acme_demo`) returned aggregate count 59, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel displays the same (mock labeled) after client hydration.
+- Live measure→Neon persist confirmed this run: GET `/api/visibility/measure` (org `org_acme_demo`) returned aggregate count 61, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel displays the same (mock labeled) after client hydration.
 - Mock provider is labeled in UI banner, Evidence cards, and API responses.
-- Onboarding wizard at `/onboarding` is reachable and functional (environment check shows database + auth Ready; mock fallback explicit).
-- Production Vercel deployment READY on latest main (dpl_7HLy93FuZnvBzHRETKzqaz5VdUWs). PWA assets present (manifest.webmanifest, sw.js, icons).
+- Onboarding wizard at `/onboarding` is reachable and functional E2E: environment check (database + auth Ready; mock fallback explicit) → organization create → batch measure (2 runs persisted) → Ready step points to dashboard Evidence.
+- Production Vercel deployment READY on latest main (dpl_G4WZwjqXb3aB6DgMkEJPRJsYAtzT). PWA assets present (manifest.webmanifest, sw.js, icons).
 - Dependabot major-version freeze configured in .github/dependabot.yml.
 - **CI blocker remains:** GitHub Actions fail with account locked due to billing issue. Vercel deploys independent.
 - Walkthrough assets advanced: headless screenshots + slideshow MP4 generated (drawtext unavailable; image sequence used). Exact click path and 60s script remain in this file. HUMAN: optional voiceover / Loom upload.
 
 ## Seeded live demo note
 
-Public demo org `org_acme_demo` has 59+ persisted evaluation runs. Dashboard Evidence shows them without authentication. Sample/Seeded modes remain independent of the live Evidence panel.
+Public demo org `org_acme_demo` has 61+ persisted evaluation runs. Dashboard Evidence shows them without authentication. Sample/Seeded modes remain independent of the live Evidence panel.
