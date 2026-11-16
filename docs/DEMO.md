@@ -91,7 +91,7 @@ Readiness endpoint (`GET /api/readiness`) already surfaces whether any AI provid
 - `/dashboard` (dashboard.png)
 - `/onboarding` (onboarding.png)
 
-Screenshots + ~26s slideshow MP4 (kyzen-buyer-walkthrough.mp4) produced in agent artifacts this run (no drawtext; pure image sequence). HUMAN: optionally add voiceover or upload to Loom; attach stills to listing.
+Screenshots + 75s slideshow MP4 (kyzen-buyer-walkthrough.mp4) produced in agent artifacts this run (no drawtext; pure image sequence of start/dashboard/onboarding). HUMAN: optionally add voiceover or upload to Loom; attach stills to listing.
 
 ## 60-second script (HUMAN: record 60s)
 
@@ -104,15 +104,15 @@ Screenshots + ~26s slideshow MP4 (kyzen-buyer-walkthrough.mp4) produced in agent
 
 Record at 1080p; link the video URL in README when uploaded.
 
-## Latest verification (2026-11-15 06:16 UTC)
+## Latest verification (2026-11-16 06:18 UTC)
 
-- Live measure→Neon persist confirmed this run: GET `/api/visibility/measure` (org `org_acme_demo`) returned aggregate count 61, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel displays the same (mock labeled) after client hydration.
+- Live measure→Neon persist confirmed: GET `/api/visibility/measure` (org `org_acme_demo`) returned aggregate count 61, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel displays the same (mock labeled) after client hydration.
 - Mock provider is labeled in UI banner, Evidence cards, and API responses.
 - Onboarding wizard at `/onboarding` is reachable and functional E2E: environment check (database + auth Ready; mock fallback explicit) → organization create → batch measure (2 runs persisted) → Ready step points to dashboard Evidence.
-- Production Vercel deployment READY on latest main (dpl_G4WZwjqXb3aB6DgMkEJPRJsYAtzT). PWA assets present (manifest.webmanifest, sw.js, icons).
+- Production Vercel deployment READY on latest main. PWA assets present (manifest.webmanifest, sw.js, icons).
 - Dependabot major-version freeze configured in .github/dependabot.yml.
 - **CI blocker remains:** GitHub Actions fail with account locked due to billing issue. Vercel deploys independent.
-- Walkthrough assets advanced: headless screenshots + slideshow MP4 generated (drawtext unavailable; image sequence used). Exact click path and 60s script remain in this file. HUMAN: optional voiceover / Loom upload.
+- Walkthrough assets advanced this run: headless screenshots + 75s slideshow MP4 generated (drawtext unavailable in ffmpeg; pure image sequence of /start, /dashboard, /onboarding). Exact click path and 60s script remain in this file. HUMAN: optional voiceover / Loom upload.
 
 ## Seeded live demo note
 
