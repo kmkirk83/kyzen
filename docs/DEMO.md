@@ -104,9 +104,9 @@ Screenshots + 75s slideshow MP4 (kyzen-buyer-walkthrough.mp4) produced in agent 
 
 Record at 1080p; link the video URL in README when uploaded.
 
-## Latest verification (2026-11-16 06:18–06:19 UTC)
+## Latest verification (2026-11-17 06:15 UTC)
 
-- Live measure→Neon persist confirmed this run: POST `/api/visibility/measure` (org `org_acme_demo`, brandName Acme Demo, prompt “best AI visibility tools for brands”) returned a new run id; subsequent GET returned aggregate count **62**, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel loads the same contract after client hydration.
+- Live measure→Neon persist confirmed this run: POST `/api/visibility/measure` (org `org_acme_demo`, brandName Kyzen Verify, prompt “What is kyzen AI visibility platform?”) returned a new run id; subsequent GET returned aggregate count **65**, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel loads the same contract after client hydration.
 - Mock provider is labeled in UI banner, Evidence cards, and API responses.
 - Onboarding wizard at `/onboarding`, `/start`, and `/dashboard` all return HTTP 200.
 - Readiness: database + authentication configured; AI providers not set (mock fallback intentional and documented).
@@ -117,4 +117,4 @@ Record at 1080p; link the video URL in README when uploaded.
 
 ## Seeded live demo note
 
-Public demo org `org_acme_demo` has 62+ persisted evaluation runs. Dashboard Evidence shows them without authentication. Sample/Seeded modes remain independent of the live Evidence panel.
+Public demo org `org_acme_demo` has 65+ persisted evaluation runs. Dashboard Evidence shows them without authentication. Sample/Seeded modes remain independent of the live Evidence panel.
