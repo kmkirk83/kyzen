@@ -91,7 +91,7 @@ Readiness endpoint (`GET /api/readiness`) already surfaces whether any AI provid
 - `/dashboard` (dashboard.png)
 - `/onboarding` (onboarding.png)
 
-Screenshots + 75s slideshow MP4 (kyzen-buyer-walkthrough.mp4) produced in agent artifacts this run (no drawtext; pure image sequence of start/dashboard/onboarding). HUMAN: optionally add voiceover or upload to Loom; attach stills to listing.
+Screenshots produced in agent artifacts this run. MP4 generation blocked by missing drawtext filter in environment ffmpeg. HUMAN: optionally add voiceover or upload to Loom; attach stills to listing.
 
 ## 60-second script (HUMAN: record 60s)
 
@@ -104,17 +104,17 @@ Screenshots + 75s slideshow MP4 (kyzen-buyer-walkthrough.mp4) produced in agent 
 
 Record at 1080p; link the video URL in README when uploaded.
 
-## Latest verification (2026-11-17 06:15 UTC)
+## Latest verification (2026-11-18 06:20 UTC)
 
-- Live measure→Neon persist confirmed this run: POST `/api/visibility/measure` (org `org_acme_demo`, brandName Kyzen Verify, prompt “What is kyzen AI visibility platform?”) returned a new run id; subsequent GET returned aggregate count **65**, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel loads the same contract after client hydration.
+- Live measure→Neon persist confirmed this run: POST `/api/visibility/measure` (org `org_acme_demo`, brandName Kyzen Sale Check, prompt “Is kyzen ready for sale verification?”) returned 201 and new run id; subsequent GET returned aggregate count **66**, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel loads the same contract after client hydration.
 - Mock provider is labeled in UI banner, Evidence cards, and API responses.
 - Onboarding wizard at `/onboarding`, `/start`, and `/dashboard` all return HTTP 200.
 - Readiness: database + authentication configured; AI providers not set (mock fallback intentional and documented).
 - Production Vercel deployment READY. PWA assets present (manifest.webmanifest, sw.js, icons).
 - Dependabot major-version freeze configured in .github/dependabot.yml.
 - **CI blocker remains:** GitHub Actions fail with account locked due to billing issue. Vercel deploys independent of CI.
-- Walkthrough assets advanced this run: headless screenshots + 75s slideshow MP4 generated (pure image sequence of /start, /dashboard, /onboarding). Exact click path and 60s script remain in this file. HUMAN: optional voiceover / Loom upload and attach to listing / README.
+- Walkthrough assets advanced this run: headless screenshots of /start, /dashboard, /onboarding generated. Exact click path and 60s script remain in this file. MP4 slideshow blocked (ffmpeg drawtext unavailable). HUMAN: optional voiceover / Loom upload and attach to listing / README.
 
 ## Seeded live demo note
 
-Public demo org `org_acme_demo` has 65+ persisted evaluation runs. Dashboard Evidence shows them without authentication. Sample/Seeded modes remain independent of the live Evidence panel.
+Public demo org `org_acme_demo` has 66+ persisted evaluation runs. Dashboard Evidence shows them without authentication. Sample/Seeded modes remain independent of the live Evidence panel.
