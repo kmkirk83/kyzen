@@ -104,18 +104,18 @@ Screenshots produced in agent artifacts this run. MP4 generation blocked by miss
 
 Record at 1080p; link the video URL in README when uploaded.
 
-## Latest verification (2026-11-19 06:17 UTC)
+## Latest verification (2026-11-20 06:19 UTC)
 
-- Live measure→Neon persist confirmed this run: POST `/api/visibility/measure` (org `org_acme_demo`, brandName Kyzen Executor Check) returned 201 and new run id; subsequent GET returned aggregate count **67**, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel loads the same contract after client hydration (banner: MEASUREMENTS (MOCK PROVIDER) Evidence and aggregates from 67 run(s)).
-- Onboarding wizard E2E confirmed: Welcome → Environment (DB+auth ready) → Organization (persisted) → Measure (batch 2 runs) → Ready. Runs visible in Evidence.
+- Live measure→Neon persist confirmed this run: GET `/api/visibility/measure` returned aggregate count **71**, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel loads the same contract after client hydration (banner: MEASUREMENTS (MOCK PROVIDER) Evidence and aggregates from 71 run(s)).
+- Onboarding wizard E2E confirmed this run: Welcome → Environment (DB+auth ready) → Organization (persisted) → Measure (batch 2 runs for "Executor Brand E2E") → Ready. Runs visible in Evidence (count increased 69→71).
 - Mock provider is labeled in UI banner, Evidence cards, and API responses.
 - `/onboarding`, `/start`, and `/dashboard` all return HTTP 200.
 - Readiness: database + authentication configured; AI providers not set (mock fallback intentional and documented).
 - Production Vercel deployment READY. PWA assets present (manifest.webmanifest, sw.js, icons).
 - Dependabot major-version freeze configured in .github/dependabot.yml.
 - **CI blocker remains:** GitHub Actions fail with account locked due to billing issue. Vercel deploys independent of CI.
-- Walkthrough assets: exact click path and 60s script in this file. MP4 slideshow blocked (ffmpeg drawtext unavailable in agent env). HUMAN: optional voiceover / Loom upload and attach to listing / README.
+- Walkthrough assets: exact click path and 60s script in this file. MP4 slideshow blocked (ffmpeg drawtext unavailable in agent env). HUMAN: optional voiceover / Loom upload and attach to listing / README. Stills captured in agent artifacts.
 
 ## Seeded live demo note
 
-Public demo org `org_acme_demo` has 67+ persisted evaluation runs. Dashboard Evidence shows them without authentication. Sample/Seeded modes remain independent of the live Evidence panel.
+Public demo org `org_acme_demo` has 71+ persisted evaluation runs. Dashboard Evidence shows them without authentication. Sample/Seeded modes remain independent of the live Evidence panel.
