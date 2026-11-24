@@ -104,9 +104,9 @@ Screenshots produced in agent artifacts this run. MP4 generation blocked by miss
 
 Record at 1080p; link the video URL in README when uploaded.
 
-## Latest verification (2026-11-23 06:15 UTC)
+## Latest verification (2026-11-24 06:15 UTC)
 
-- Live measure→Neon persist confirmed this run: POST `/api/visibility/measure` (new org `org_test_executor_*`, brandName Kyzen Test) returned 201 and new run id; subsequent GET with same `x-organization-id` returned aggregate count **1**, `persisted: true`, providers: ["mock"]. Public demo org shows 73+ runs. Dashboard Evidence panel loads the contract (banner: MEASUREMENTS (MOCK PROVIDER) Evidence and aggregates from 73 run(s)).
+- Live measure→Neon persist confirmed this run: POST `/api/visibility/measure` (org `org_acme_demo`, brandName Kyzen Executor Check 2026-11-23) returned 201 and new run id; subsequent GET with same `x-organization-id` returned aggregate count **74**, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel loads the contract (banner: MEASUREMENTS (MOCK PROVIDER) Evidence and aggregates from 74 run(s)).
 - Onboarding wizard present and starts cleanly (Welcome → Environment Check). Previous E2E batch measure verified; new runs continue to appear in Evidence.
 - Mock provider is labeled in UI banner, Evidence cards, and API responses.
 - `/onboarding`, `/start`, and `/dashboard` all return HTTP 200.
@@ -118,4 +118,4 @@ Record at 1080p; link the video URL in README when uploaded.
 
 ## Seeded live demo note
 
-Public demo org `org_acme_demo` has 73+ persisted evaluation runs. Dashboard Evidence shows them without authentication. Sample/Seeded modes remain independent of the live Evidence panel.
+Public demo org `org_acme_demo` has 74+ persisted evaluation runs. Dashboard Evidence shows them without authentication. Sample/Seeded modes remain independent of the live Evidence panel.
