@@ -104,10 +104,11 @@ Screenshots produced in agent artifacts this run. MP4 generation blocked by miss
 
 Record at 1080p; link the video URL in README when uploaded.
 
-## Latest verification (2026-11-24 06:15 UTC)
+## Latest verification (2026-11-25 06:15 UTC)
 
-- Live measure→Neon persist confirmed this run: POST `/api/visibility/measure` (org `org_acme_demo`, brandName Kyzen Executor Check 2026-11-23) returned 201 and new run id; subsequent GET with same `x-organization-id` returned aggregate count **74**, `persisted: true`, providers: ["mock"]. Dashboard Evidence panel loads the contract (banner: MEASUREMENTS (MOCK PROVIDER) Evidence and aggregates from 74 run(s)).
-- Onboarding wizard present and starts cleanly (Welcome → Environment Check). Previous E2E batch measure verified; new runs continue to appear in Evidence.
+- Live measure→Neon persist reconfirmed this run: POST `/api/visibility/measure` (org `org_executor_test_1795587279`, brandName Kyzen Executor Verify 2026-11-24) returned 201 and new run id; subsequent GET with same `x-organization-id` returned aggregate count **1**, `persisted: true`, providers: ["mock"].
+- Dashboard Evidence panel loads the contract (banner: MEASUREMENTS (MOCK PROVIDER) Evidence and aggregates from 74+ run(s) on default org).
+- Onboarding wizard present and starts cleanly (Welcome → Environment Check).
 - Mock provider is labeled in UI banner, Evidence cards, and API responses.
 - `/onboarding`, `/start`, and `/dashboard` all return HTTP 200.
 - Readiness: database + authentication configured; AI providers not set (mock fallback intentional and documented).
