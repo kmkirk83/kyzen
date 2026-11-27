@@ -104,10 +104,10 @@ Screenshots produced in agent artifacts this run. MP4 generation blocked by miss
 
 Record at 1080p; link the video URL in README when uploaded.
 
-## Latest verification (2026-11-26 06:16 UTC)
+## Latest verification (2026-11-27 06:16 UTC)
 
-- Live measure→Neon persist reconfirmed this run: POST `/api/visibility/measure` (org `org_executor_verify_1795673766`, brandName Kyzen Executor Verify 2026-11-25) returned 201 and new run id `cmwx5sqiy0001jv08hdmhiauz`; subsequent GET with same `x-organization-id` returned aggregate count **1**, `persisted: true`, providers: ["mock"], latest brand matching.
-- Dashboard Evidence panel loads the contract (banner: Evidence and aggregates from 74+ run(s) on default org_acme_demo; MEASUREMENTS (MOCK PROVIDER)).
+- Live measure→Neon persist reconfirmed this run: POST `/api/visibility/measure` (org `org_executor_test_1795760151`, brandName Kyzen Executor Check 2026-11-26) returned 201 and new run id; subsequent GET with same `x-organization-id` returned aggregate count **1**, `persisted: true`, providers: ["mock"], first run brand matching.
+- Dashboard Evidence panel loads the contract (banner: MEASUREMENTS (MOCK PROVIDER) Evidence and aggregates from 74 run(s) on default org_acme_demo).
 - Onboarding wizard present and starts cleanly (Welcome → Environment Check).
 - Mock provider is labeled in UI banner, Evidence cards, and API responses.
 - `/onboarding`, `/start`, and `/dashboard` all return HTTP 200.
@@ -115,7 +115,7 @@ Record at 1080p; link the video URL in README when uploaded.
 - Production Vercel deployment READY. PWA assets present (manifest.webmanifest, sw.js, icons).
 - Dependabot major-version freeze configured in .github/dependabot.yml.
 - **CI blocker remains:** GitHub Actions fail with account locked due to billing issue. Vercel deploys independent of CI.
-- Walkthrough assets: exact click path and 60s script in this file. MP4 slideshow blocked (ffmpeg drawtext unavailable in agent env). HUMAN: optional voiceover / Loom upload and attach to listing / README. Stills (start.png, dashboard.png, onboarding.png) captured in agent artifacts this run.
+- Walkthrough assets: exact click path and 60s script in this file. MP4 slideshow blocked (ffmpeg drawtext unavailable in agent env). HUMAN: optional voiceover / Loom upload and attach to listing / README. Stills (start.png, dashboard.png, onboarding.png) captured in prior agent artifacts.
 
 ## Seeded live demo note
 
